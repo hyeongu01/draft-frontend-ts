@@ -6,8 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 export default function Page(): React.ReactElement {
   const supabase = createClient();
 
-  const googleLogin = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
+  const googleLogin = () => {
+    supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
