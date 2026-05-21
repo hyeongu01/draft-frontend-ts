@@ -1,14 +1,21 @@
 "use client";
-
-import React from "react";
+import { type JSX } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export default function Page(): React.ReactElement {
+export default function Page(): JSX.Element {
   const supabase = createClient();
 
   const googleLogin = () => {
     supabase.auth.signInWithOAuth({
       provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+  };
+  const githubLogin = () => {
+    supabase.auth.signInWithOAuth({
+      provider: "github",
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
@@ -61,6 +68,7 @@ export default function Page(): React.ReactElement {
           <button
             type="button"
             className="flex items-center justify-center gap-3 w-full px-4 py-2.5 rounded-lg bg-gray-900 text-sm font-medium text-white hover:bg-gray-800 transition"
+            onClick={githubLogin}
           >
             <svg
               className="w-5 h-5"
