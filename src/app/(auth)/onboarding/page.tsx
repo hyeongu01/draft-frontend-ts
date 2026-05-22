@@ -1,13 +1,27 @@
 "use client";
+import { useUserContext } from "@/context/AuthContext";
+import { ProfileService } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/client";
-import { type JSX } from "react";
+import { redirect } from "next/navigation";
+import { useEffect, type JSX, useState } from "react";
+
+const supabase = createClient();
+const profileService = new ProfileService(supabase);
 
 export default function OnboardingPage(): JSX.Element {
-  const supabase = createClient();
+  const [nickname, setNickname] = useState<string>("");
+  const { user, isLoading } = useUserContext();
 
   const handleClick = () => {
-    console.log("sdf");
+    console.log(user, nickname);
+    if (!user) throw Error("유저가 없습니다.");
+    profileService.signup(user, nickname).then(() => {
+      redirect("/");
+    });
   };
+
+  if (isLoading) return <>로딩중</>;
+  if (!user) redirect("/login");
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
@@ -46,6 +60,8 @@ export default function OnboardingPage(): JSX.Element {
             <input
               type="text"
               placeholder="design_lee"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
               className="w-full px-3 py-2.5 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-gray-400 transition-colors"
             />
             <p className="text-xs text-gray-400 leading-relaxed">

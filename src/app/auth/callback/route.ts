@@ -15,6 +15,18 @@ export async function GET(request: Request) {
     if (!error) {
       const forwardedHost = request.headers.get("x-forwarded-host");
       const isLocalEnv = process.env.NODE_ENV === "development";
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("User 를 찾을 수 없습니다.");
+
+      const { data: userProfile } = await supabase
+        .from("Profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (!userProfile) return NextResponse.redirect(`${origin}/onboarding`);
 
       if (isLocalEnv) {
         return NextResponse.redirect(`${origin}${next}`);
@@ -27,5 +39,5 @@ export async function GET(request: Request) {
   }
 
   // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/onboarding`);
+  return NextResponse.redirect(`${origin}/onboarding`);
 }
