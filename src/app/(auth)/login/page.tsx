@@ -1,9 +1,15 @@
 "use client";
 import { type JSX } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useUserContext } from "@/context/AuthContext";
+import { redirect, RedirectType } from "next/navigation";
 
+const supabase = createClient();
 export default function Page(): JSX.Element {
-  const supabase = createClient();
+  const { user, profile, isLoading } = useUserContext();
+  if (isLoading) return <>로딩중</>;
+  if (profile) return redirect("/");
+  if (user) return redirect("/auth/callback");
 
   const googleLogin = () => {
     supabase.auth.signInWithOAuth({

@@ -10,7 +10,10 @@ const profileService = new ProfileService(supabase);
 
 export default function OnboardingPage(): JSX.Element {
   const [nickname, setNickname] = useState<string>("");
-  const { user, isLoading } = useUserContext();
+  const { user, profile, isLoading } = useUserContext();
+  if (isLoading) return <>로딩중</>;
+  if (profile) return redirect("/");
+  if (user) return redirect("/auth/callback");
 
   const handleClick = () => {
     console.log(user, nickname);

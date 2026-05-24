@@ -1,45 +1,60 @@
 "use client";
-import {
-  createContext,
-  useState,
-  useContext,
-  useCallback,
-  useEffect,
-} from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { type User } from "@supabase/supabase-js";
+import { type Profile } from "@/lib/profile";
 
 interface UserContextType {
   user: User | null;
+  profile: Profile | null;
   isLoading: boolean;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
+const supabase = createClient();
 
-export function UserProvier({
+export function UserProvider({
   children,
 }: {
   children: React.ReactNode;
 }): React.ReactNode {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const supabase = createClient();
+  const [profile, setProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-      setIsLoading(false);
-    });
+    const loadProfile = async (userId: string) => {
+      const { data, error } = await supabase
+        .from("Profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+      if (error) console.error(error.message);
+      setProfile(data ?? null);
+    };
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
+    // supabase auth 상태 변화 구독
+    const { data: sub } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        const u = session?.user ?? null;
+        setUser(u);
+        if (u) {
+          setTimeout(() => {
+            loadProfile(u.id).finally(() => {
+              setIsLoading((prev) => (prev ? false : prev));
+            });
+          }, 0);
+        } else {
+          setProfile(null);
+          setIsLoading((prev) => (prev ? false : prev));
+        }
+      },
+    );
     return () => sub.subscription.unsubscribe();
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, isLoading }}>
+    <UserContext.Provider value={{ user, profile, isLoading }}>
       {children}
     </UserContext.Provider>
   );

@@ -1,6 +1,8 @@
 import { type Database } from "@/lib/supabase/database.types";
 import { SupabaseClient, User } from "@supabase/supabase-js";
 
+export type Profile = Database["public"]["Tables"]["Profiles"]["Row"];
+
 export class ProfileService {
   constructor(readonly supabaseClient: SupabaseClient<Database>) {}
 
