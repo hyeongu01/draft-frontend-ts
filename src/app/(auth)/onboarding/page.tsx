@@ -2,29 +2,30 @@
 import { useUserContext } from "@/context/AuthContext";
 import { ProfileService } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/client";
-import { redirect } from "next/navigation";
-import { useEffect, type JSX, useState } from "react";
+import { redirect, useRouter } from "next/navigation";
+import { type JSX, useState } from "react";
 
 const supabase = createClient();
 const profileService = new ProfileService(supabase);
 
 export default function OnboardingPage(): JSX.Element {
   const [nickname, setNickname] = useState<string>("");
-  const { user, profile, isLoading } = useUserContext();
+  const { user, profile, isLoading, signup } = useUserContext();
+  const router = useRouter();
   if (isLoading) return <>로딩중</>;
+  if (!user) return redirect("/login");
   if (profile) return redirect("/");
-  if (user) return redirect("/auth/callback");
 
-  const handleClick = () => {
-    console.log(user, nickname);
+  const handleClick = async () => {
     if (!user) throw Error("유저가 없습니다.");
-    profileService.signup(user, nickname).then(() => {
-      redirect("/");
-    });
+    try {
+      const data = await profileService.signup(user, nickname);
+      await signup();
+      router.push("/");
+    } catch (e) {
+      throw e;
+    }
   };
-
-  if (isLoading) return <>로딩중</>;
-  if (!user) redirect("/login");
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">

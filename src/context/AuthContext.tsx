@@ -8,6 +8,7 @@ interface UserContextType {
   user: User | null;
   profile: Profile | null;
   isLoading: boolean;
+  signup: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -22,17 +23,24 @@ export function UserProvider({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [profile, setProfile] = useState<Profile | null>(null);
 
-  useEffect(() => {
-    const loadProfile = async (userId: string) => {
-      const { data, error } = await supabase
-        .from("Profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
-      if (error) console.error(error.message);
-      setProfile(data ?? null);
-    };
+  const loadProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("Profiles")
+      .select("*")
+      .eq("id", userId)
+      .maybeSingle();
+    if (error) console.error(error.message);
+    setProfile(data ?? null);
+  };
 
+  const signup = async () => {
+    if (!user) throw new Error("user_not_found");
+    setIsLoading(true);
+    await loadProfile(user.id);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
     // supabase auth 상태 변화 구독
     const { data: sub } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
@@ -54,7 +62,7 @@ export function UserProvider({
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, profile, isLoading }}>
+    <UserContext.Provider value={{ user, profile, isLoading, signup }}>
       {children}
     </UserContext.Provider>
   );

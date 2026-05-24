@@ -8,8 +8,8 @@ const supabase = createClient();
 export default function Page(): JSX.Element {
   const { user, profile, isLoading } = useUserContext();
   if (isLoading) return <>로딩중</>;
-  if (profile) return redirect("/");
-  if (user) return redirect("/auth/callback");
+  if (profile && user) return redirect("/");
+  if (user) return redirect("/onboarding");
 
   const googleLogin = () => {
     supabase.auth.signInWithOAuth({
