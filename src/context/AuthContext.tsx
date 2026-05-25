@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useState, useContext, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { type User } from "@supabase/supabase-js";
 import { type Profile } from "@/lib/profile";
@@ -8,7 +8,7 @@ interface UserContextType {
   user: User | null;
   profile: Profile | null;
   isLoading: boolean;
-  signup: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -33,7 +33,7 @@ export function UserProvider({
     setProfile(data ?? null);
   };
 
-  const signup = async () => {
+  const refreshProfile = async () => {
     if (!user) throw new Error("user_not_found");
     setIsLoading(true);
     await loadProfile(user.id);
@@ -62,7 +62,7 @@ export function UserProvider({
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, profile, isLoading, signup }}>
+    <UserContext.Provider value={{ user, profile, isLoading, refreshProfile }}>
       {children}
     </UserContext.Provider>
   );

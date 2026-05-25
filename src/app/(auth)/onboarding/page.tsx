@@ -2,28 +2,37 @@
 import { useUserContext } from "@/context/AuthContext";
 import { ProfileService } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/client";
-import { redirect, useRouter } from "next/navigation";
-import { type JSX, useState } from "react";
+import { useRouter } from "next/navigation";
+import { type JSX, useEffect, useState } from "react";
 
 const supabase = createClient();
 const profileService = new ProfileService(supabase);
 
 export default function OnboardingPage(): JSX.Element {
   const [nickname, setNickname] = useState<string>("");
-  const { user, profile, isLoading, signup } = useUserContext();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const { user, profile, isLoading, refreshProfile } = useUserContext();
   const router = useRouter();
-  if (isLoading) return <>로딩중</>;
-  if (!user) return redirect("/login");
-  if (profile) return redirect("/");
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (!user) router.replace("/login");
+    else if (profile) router.replace("/");
+  }, [isLoading, user, profile, router]);
+
+  if (isLoading || !user || profile) return <>로딩중</>;
 
   const handleClick = async () => {
-    if (!user) throw Error("유저가 없습니다.");
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
-      const data = await profileService.signup(user, nickname);
-      await signup();
-      router.push("/");
+      await profileService.signup(user, nickname);
+      await refreshProfile();
+      setIsSubmitting(false);
     } catch (e) {
-      throw e;
+      setIsSubmitting(false);
+      console.error("signup_error");
+      router.push("/error?code=signup_error");
     }
   };
 
@@ -66,6 +75,9 @@ export default function OnboardingPage(): JSX.Element {
               placeholder="design_lee"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                if (e.key === "Enter") handleClick();
+              }}
               className="w-full px-3 py-2.5 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-gray-400 transition-colors"
             />
             <p className="text-xs text-gray-400 leading-relaxed">
@@ -75,10 +87,11 @@ export default function OnboardingPage(): JSX.Element {
 
           {/* Submit */}
           <button
-            className="w-full py-3 rounded-lg bg-gray-900 hover:bg-gray-800 text-sm font-medium text-white transition-colors"
+            className="w-full py-3 rounded-lg bg-gray-900 hover:bg-gray-800 text-sm font-medium text-white transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             onClick={handleClick}
+            disabled={isSubmitting}
           >
-            Drafted 시작하기
+            {isSubmitting ? "처리 중..." : "Drafted 시작하기"}
           </button>
 
           {/* Footer note */}
