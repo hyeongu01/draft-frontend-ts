@@ -2,7 +2,7 @@
 import { type JSX, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useUserContext } from "@/context/AuthContext";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const supabase = createClient();
 export default function Page(): JSX.Element {
