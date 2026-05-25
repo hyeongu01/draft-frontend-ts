@@ -4,8 +4,7 @@ import { type JSX } from "react";
 const REASONS: Record<string, { title: string; description: string }> = {
   oauth_failed: {
     title: "로그인에 실패했어요",
-    description:
-      "인증 과정에서 문제가 발생했어요. 잠시 후 다시 시도해 주세요.",
+    description: "인증 과정에서 문제가 발생했어요. 잠시 후 다시 시도해 주세요.",
   },
   no_code: {
     title: "잘못된 접근이에요",
@@ -14,6 +13,10 @@ const REASONS: Record<string, { title: string; description: string }> = {
   no_user: {
     title: "사용자 정보를 찾을 수 없어요",
     description: "세션은 만들어졌지만 사용자 정보를 가져오지 못했어요.",
+  },
+  signup_failed: {
+    title: "가입에 실패했어요",
+    description: "잠시 후 다시 시도해 주세요.",
   },
 };
 

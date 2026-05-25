@@ -32,7 +32,7 @@ export default function OnboardingPage(): JSX.Element {
       router.replace("/");
     } catch (e) {
       setIsSubmitting(false);
-      router.push("/error?code=signup_error");
+      router.push("/error?reason=signup_error");
     }
   };
 
