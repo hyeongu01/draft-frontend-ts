@@ -29,9 +29,9 @@ export default function OnboardingPage(): JSX.Element {
       await profileService.signup(user, nickname);
       await refreshProfile();
       setIsSubmitting(false);
+      router.replace("/");
     } catch (e) {
       setIsSubmitting(false);
-      console.error("signup_error");
       router.push("/error?code=signup_error");
     }
   };
