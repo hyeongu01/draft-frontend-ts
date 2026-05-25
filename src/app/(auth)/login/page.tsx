@@ -1,15 +1,21 @@
 "use client";
-import { type JSX } from "react";
+import { type JSX, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useUserContext } from "@/context/AuthContext";
-import { redirect, RedirectType } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 const supabase = createClient();
 export default function Page(): JSX.Element {
   const { user, profile, isLoading } = useUserContext();
-  if (isLoading) return <>로딩중</>;
-  if (profile && user) return redirect("/");
-  if (user) return redirect("/onboarding");
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (profile && user) return router.replace("/");
+    if (user) return router.replace("/onboarding");
+  }, [isLoading, profile, user]);
+
+  if (isLoading || user) return <>로딩중</>;
 
   const googleLogin = () => {
     supabase.auth.signInWithOAuth({
