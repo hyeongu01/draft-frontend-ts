@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { type JSX } from "react";
+import { Suspense, type JSX } from "react";
 
 const REASONS: Record<string, { title: string; description: string }> = {
   oauth_failed: {
@@ -29,12 +29,36 @@ type PageProps = {
   searchParams: Promise<{ reason?: string }>;
 };
 
-export default async function ErrorPage({
+async function ErrorMessage({
   searchParams,
 }: PageProps): Promise<JSX.Element> {
   const { reason } = await searchParams;
   const { title, description } = REASONS[reason ?? ""] ?? DEFAULT;
 
+  return (
+    <div className="space-y-3">
+      <div className="text-6xl">😵</div>
+      <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
+      <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
+    </div>
+  );
+}
+
+function ErrorMessageFallback(): JSX.Element {
+  return (
+    <div className="space-y-3">
+      <div className="text-6xl">😵</div>
+      <h1 className="text-xl font-semibold text-gray-900">
+        {DEFAULT.title}
+      </h1>
+      <p className="text-sm text-gray-500 leading-relaxed">
+        {DEFAULT.description}
+      </p>
+    </div>
+  );
+}
+
+export default function ErrorPage({ searchParams }: PageProps): JSX.Element {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-4 py-12">
       <div className="w-full max-w-sm space-y-10 text-center">
@@ -44,11 +68,9 @@ export default async function ErrorPage({
           </div>
         </div>
 
-        <div className="space-y-3">
-          <div className="text-6xl">😵</div>
-          <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
-          <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
-        </div>
+        <Suspense fallback={<ErrorMessageFallback />}>
+          <ErrorMessage searchParams={searchParams} />
+        </Suspense>
 
         <Link
           href="/login"
