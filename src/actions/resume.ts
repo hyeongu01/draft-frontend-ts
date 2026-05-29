@@ -16,15 +16,14 @@ export async function createResume(
 
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { data: claims } = await supabase.auth.getClaims();
+  const userId = claims?.claims?.sub;
+  if (!userId) redirect("/login");
 
   const { data, error } = await supabase
     .from("resumes")
     .insert({
-      user_id: user.id,
+      user_id: userId,
       title,
       content: {},
       is_public: false,
@@ -57,10 +56,8 @@ export async function updateResume(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { data: claims } = await supabase.auth.getClaims();
+  if (!claims?.claims?.sub) redirect("/login");
 
   const { error } = await supabase.from("resumes").update(updates).eq("id", id);
 
@@ -74,10 +71,8 @@ export async function updateResume(
 
 export async function deleteResume(id: string) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { data: claims } = await supabase.auth.getClaims();
+  if (!claims?.claims?.sub) redirect("/login");
 
   const { error } = await supabase.from("resumes").delete().eq("id", id);
 

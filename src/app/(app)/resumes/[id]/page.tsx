@@ -29,53 +29,47 @@ async function ResumeDetail({
   const { id } = await params;
   const supabase = await createClient();
 
-  // RLS: 공개 이력서이거나 본인 소유면 row 반환, 아니면 null
-  const { data: resume } = await supabase
-    .from("resumes")
-    .select("*")
-    .eq("id", id)
-    .single();
+  // 이력서 조회 + 현재 유저(로컬 JWT, 네트워크 X) 병렬
+  const [{ data: resume }, { data: claims }] = await Promise.all([
+    supabase.from("resumes").select("*").eq("id", id).single(),
+    supabase.auth.getClaims(),
+  ]);
 
   if (!resume) notFound();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const isOwner = user?.id === resume.user_id;
+  const userId = claims?.claims?.sub;
+  const isOwner = userId === resume.user_id;
 
-  // 조회수 증가 — 본인 조회는 제외 (RPC가 공개 이력서만 +1)
-  if (!isOwner) {
-    await supabase.rpc("increment_view_count", { p_resume_id: resume.id });
-  }
-
-  // 작성자 닉네임 (resumes↔profiles 관계가 없어 별도 조회)
-  const { data: author } = await supabase
-    .from("profiles")
-    .select("nickname")
-    .eq("id", resume.user_id)
-    .single();
-
-  // 현재 유저의 좋아요·보관 여부 (RLS상 본인 row만 조회됨)
-  let liked = false;
-  let bookmarked = false;
-  if (user) {
-    const [{ data: myLike }, { data: myBookmark }] = await Promise.all([
-      supabase
-        .from("likes")
-        .select("user_id")
-        .eq("user_id", user.id)
-        .eq("resume_id", resume.id)
-        .maybeSingle(),
-      supabase
-        .from("bookmarks")
-        .select("user_id")
-        .eq("user_id", user.id)
-        .eq("resume_id", resume.id)
-        .maybeSingle(),
-    ]);
-    liked = !!myLike;
-    bookmarked = !!myBookmark;
-  }
+  // 작성자 닉네임 + 좋아요·보관 여부 + 조회수 증가를 한 번에 병렬 처리
+  const [{ data: author }, likeRes, bookmarkRes] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("nickname")
+      .eq("id", resume.user_id)
+      .single(),
+    userId
+      ? supabase
+          .from("likes")
+          .select("user_id")
+          .eq("user_id", userId)
+          .eq("resume_id", resume.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    userId
+      ? supabase
+          .from("bookmarks")
+          .select("user_id")
+          .eq("user_id", userId)
+          .eq("resume_id", resume.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    // 조회수 증가 — 본인 제외 (RPC가 공개 이력서만 +1)
+    isOwner
+      ? Promise.resolve(null)
+      : supabase.rpc("increment_view_count", { p_resume_id: resume.id }),
+  ]);
+  const liked = !!likeRes.data;
+  const bookmarked = !!bookmarkRes.data;
 
   const { sections } = normalizeContent(resume.content);
   const renderedSections = sections

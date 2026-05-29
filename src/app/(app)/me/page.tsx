@@ -83,15 +83,14 @@ function TabsSkeleton() {
 
 async function ProfileHeader() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { data: claims } = await supabase.auth.getClaims();
+  const userId = claims?.claims?.sub;
+  if (!userId) redirect("/login");
 
   const { data: profile } = await supabase
     .from("profiles")
     .select("nickname")
-    .eq("id", user.id)
+    .eq("id", userId)
     .single();
 
   const nickname = profile?.nickname ?? "사용자";
@@ -129,10 +128,9 @@ function ProfileHeaderSkeleton() {
 
 async function TabContent({ tab }: { tab: Tab }) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { data: claims } = await supabase.auth.getClaims();
+  const userId = claims?.claims?.sub;
+  if (!userId) redirect("/login");
 
   if (tab === "resumes") {
     const [{ data: resumes }, { data: profile }] = await Promise.all([
@@ -142,7 +140,7 @@ async function TabContent({ tab }: { tab: Tab }) {
           "id, title, description, job_role, experience_years, is_public, like_count, save_count, view_count",
         )
         .order("updated_at", { ascending: false }),
-      supabase.from("profiles").select("nickname").eq("id", user.id).single(),
+      supabase.from("profiles").select("nickname").eq("id", userId).single(),
     ]);
 
     if (!resumes?.length) {
@@ -184,7 +182,7 @@ async function TabContent({ tab }: { tab: Tab }) {
     .select(
       "created_at, resumes(id, title, description, job_role, experience_years, user_id, like_count, save_count, view_count)",
     )
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
   const resumes = (rows ?? [])

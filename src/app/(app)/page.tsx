@@ -22,20 +22,12 @@ async function Feed({ searchParams }: { searchParams: SearchParams }) {
   const { years = "" } = await searchParams;
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  // 로컬 JWT 검증(빠름, 네트워크 X) — 실제 권한은 RLS가 보장
+  const { data: claims } = await supabase.auth.getClaims();
+  const userId = claims?.claims?.sub;
+  if (!userId) redirect("/login");
 
-  // 온보딩 미완료(프로필 없음) → 닉네임 설정으로
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("nickname")
-    .eq("id", user.id)
-    .single();
-  if (!profile?.nickname) redirect("/onboarding");
-
-  // 공개 이력서 + 연차 필터 적용 (RLS가 is_public = true 읽기 허용)
+  // 공개 이력서 + 연차 필터 (RLS가 is_public = true 읽기 허용)
   let query = supabase
     .from("resumes")
     .select(
@@ -51,9 +43,12 @@ async function Feed({ searchParams }: { searchParams: SearchParams }) {
     }
   }
 
-  const { data: resumes } = await query.order("updated_at", {
-    ascending: false,
-  });
+  // 프로필 확인 + 이력서 목록 병렬 조회 (독립적이므로)
+  const [{ data: profile }, { data: resumes }] = await Promise.all([
+    supabase.from("profiles").select("nickname").eq("id", userId).single(),
+    query.order("updated_at", { ascending: false }),
+  ]);
+  if (!profile?.nickname) redirect("/onboarding");
 
   // 작성자 닉네임을 user_id 묶어서 한 번에 조회
   const authorIds = [...new Set((resumes ?? []).map((r) => r.user_id))];

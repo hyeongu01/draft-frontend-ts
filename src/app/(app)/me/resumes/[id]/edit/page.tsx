@@ -24,16 +24,12 @@ async function EditResumeLoader({
   const { id } = await params;
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { data: resume } = await supabase
-    .from("resumes")
-    .select("*")
-    .eq("id", id)
-    .single();
+  // 이력서 조회 + 로그인 확인(로컬 JWT) 병렬
+  const [{ data: resume }, { data: claims }] = await Promise.all([
+    supabase.from("resumes").select("*").eq("id", id).single(),
+    supabase.auth.getClaims(),
+  ]);
+  if (!claims?.claims?.sub) redirect("/login");
 
   if (!resume) notFound();
 
