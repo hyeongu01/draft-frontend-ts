@@ -95,6 +95,7 @@ export type Database = {
           experience_years: number
           id: string
           is_public: boolean
+          job_role: string | null
           like_count: number
           save_count: number
           title: string
@@ -109,6 +110,7 @@ export type Database = {
           experience_years?: number
           id?: string
           is_public?: boolean
+          job_role?: string | null
           like_count?: number
           save_count?: number
           title: string
@@ -123,6 +125,7 @@ export type Database = {
           experience_years?: number
           id?: string
           is_public?: boolean
+          job_role?: string | null
           like_count?: number
           save_count?: number
           title?: string
@@ -137,7 +140,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_view_count: {
+        Args: { p_resume_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

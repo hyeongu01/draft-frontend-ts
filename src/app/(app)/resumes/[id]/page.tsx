@@ -43,6 +43,11 @@ async function ResumeDetail({
   } = await supabase.auth.getUser();
   const isOwner = user?.id === resume.user_id;
 
+  // 조회수 증가 — 본인 조회는 제외 (RPC가 공개 이력서만 +1)
+  if (!isOwner) {
+    await supabase.rpc("increment_view_count", { p_resume_id: resume.id });
+  }
+
   // 작성자 닉네임 (resumes↔profiles 관계가 없어 별도 조회)
   const { data: author } = await supabase
     .from("profiles")
@@ -101,6 +106,12 @@ async function ResumeDetail({
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 text-sm text-gray-500">
             <span>{author?.nickname ?? "익명"}</span>
+            {resume.job_role && (
+              <>
+                <span aria-hidden>·</span>
+                <span>{resume.job_role}</span>
+              </>
+            )}
             <span aria-hidden>·</span>
             <span>{formatExperience(resume.experience_years)}</span>
           </div>

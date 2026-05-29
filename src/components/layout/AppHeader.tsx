@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useUserContext } from "@/context/AuthContext";
 
 const TABS: { label: string; href: string; soon?: boolean }[] = [
-  { label: "피드", href: "/" },
+  { label: "홈", href: "/" },
   { label: "탐색", href: "/explore", soon: true },
   { label: "채팅", href: "/chats", soon: true },
 ];

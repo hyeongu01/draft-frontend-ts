@@ -18,7 +18,7 @@ export default function MePage({
   searchParams: Promise<{ tab?: string }>;
 }) {
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <div className="max-w-3xl mx-auto p-6">
       <Suspense fallback={<ProfileHeaderSkeleton />}>
         <ProfileHeader />
       </Suspense>
@@ -139,7 +139,7 @@ async function TabContent({ tab }: { tab: Tab }) {
       supabase
         .from("resumes")
         .select(
-          "id, title, description, experience_years, is_public, like_count, save_count, view_count",
+          "id, title, description, job_role, experience_years, is_public, like_count, save_count, view_count",
         )
         .order("updated_at", { ascending: false }),
       supabase.from("profiles").select("nickname").eq("id", user.id).single(),
@@ -164,6 +164,7 @@ async function TabContent({ tab }: { tab: Tab }) {
             href={`/me/resumes/${r.id}/edit`}
             title={r.title}
             description={r.description}
+            jobRole={r.job_role}
             experienceYears={r.experience_years}
             nickname={nickname}
             likeCount={r.like_count}
@@ -181,7 +182,7 @@ async function TabContent({ tab }: { tab: Tab }) {
   const { data: rows } = await supabase
     .from(table)
     .select(
-      "created_at, resumes(id, title, like_count, save_count)",
+      "created_at, resumes(id, title, description, job_role, experience_years, user_id, like_count, save_count, view_count)",
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
@@ -198,23 +199,31 @@ async function TabContent({ tab }: { tab: Tab }) {
     );
   }
 
+  // 작성자 닉네임 한 번에 조회
+  const authorIds = [...new Set(resumes.map((r) => r.user_id))];
+  const { data: authors } = await supabase
+    .from("profiles")
+    .select("id, nickname")
+    .in("id", authorIds);
+  const nicknameById = new Map((authors ?? []).map((a) => [a.id, a.nickname]));
+
   return (
-    <ul className="space-y-2">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       {resumes.map((r) => (
-        <li key={r.id}>
-          <Link
-            href={`/resumes/${r.id}`}
-            className="block p-4 border rounded-md hover:bg-gray-50"
-          >
-            <div className="font-medium mb-1">{r.title}</div>
-            <div className="flex gap-3 text-xs text-gray-400">
-              <span>♥ {r.like_count}</span>
-              <span>🔖 {r.save_count}</span>
-            </div>
-          </Link>
-        </li>
+        <ResumeCard
+          key={r.id}
+          href={`/resumes/${r.id}`}
+          title={r.title}
+          description={r.description}
+          jobRole={r.job_role}
+          experienceYears={r.experience_years}
+          nickname={nicknameById.get(r.user_id) ?? "익명"}
+          likeCount={r.like_count}
+          saveCount={r.save_count}
+          viewCount={r.view_count}
+        />
       ))}
-    </ul>
+    </div>
   );
 }
 

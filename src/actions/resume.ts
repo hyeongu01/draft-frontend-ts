@@ -43,6 +43,7 @@ export async function updateResume(
   updates: {
     title?: string;
     description?: string;
+    job_role?: string;
     is_public?: boolean;
     content?: any;
     experience_years?: number;

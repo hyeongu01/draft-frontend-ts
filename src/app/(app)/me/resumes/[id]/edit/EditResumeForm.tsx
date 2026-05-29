@@ -15,6 +15,7 @@ type Resume = {
   id: string;
   title: string;
   description: string | null;
+  job_role: string | null;
   is_public: boolean;
   content: unknown;
   experience_years: number;
@@ -23,6 +24,7 @@ type Resume = {
 export default function EditResumeForm({ resume }: { resume: Resume }) {
   const [title, setTitle] = useState(resume.title);
   const [description, setDescription] = useState(resume.description ?? "");
+  const [jobRole, setJobRole] = useState(resume.job_role ?? "");
   const [isPublic, setIsPublic] = useState(resume.is_public);
   const [experienceYears, setExperienceYears] = useState(
     resume.experience_years,
@@ -64,6 +66,7 @@ export default function EditResumeForm({ resume }: { resume: Resume }) {
       const result = await updateResume(resume.id, {
         title,
         description: description.trim(),
+        job_role: jobRole.trim(),
         is_public: isPublic,
         content: { version: 1, sections },
         experience_years: experienceYears,
@@ -82,30 +85,101 @@ export default function EditResumeForm({ resume }: { resume: Resume }) {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <div className="max-w-4xl mx-auto p-6">
+      {/* 툴바 */}
       <div className="flex items-center justify-between mb-6">
-        <Link href="/me" className="text-sm text-gray-500 hover:underline">
-          ← 내 이력서로
-        </Link>
-        {savedAt && (
-          <span className="text-xs text-gray-400">
-            저장됨 · {savedAt.toLocaleTimeString()}
-          </span>
-        )}
+        <div className="flex items-center gap-3">
+          <Link href="/me" className="text-sm text-gray-500 hover:underline">
+            ← 내 이력서로
+          </Link>
+          {savedAt && (
+            <span className="text-xs text-gray-400">
+              저장됨 · {savedAt.toLocaleTimeString()}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleDelete}
+            disabled={isPending}
+            className="px-3 py-1.5 border border-red-300 text-red-600 rounded-md text-sm font-medium hover:bg-red-50 disabled:opacity-50"
+          >
+            삭제
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={isPending || !!yearsError}
+            className="px-4 py-1.5 bg-black text-white rounded-md text-sm font-medium disabled:opacity-50"
+          >
+            {isPending ? "저장 중..." : "저장"}
+          </button>
+        </div>
       </div>
 
-      <div className="space-y-6">
-        <div className="flex gap-3 items-start">
-          <div className="flex-1">
-            <label className="block text-sm font-medium mb-1">제목</label>
+      {/* 2단: 좌 에디터 / 우 발행 설정 */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-6 items-start">
+        {/* 좌: 에디터 */}
+        <div className="space-y-5 order-2 lg:order-1">
+          <div>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+              placeholder="이력서 제목 (예: 시니어로 점프하기 위한 5년의 정리)"
+              className="w-full text-2xl font-semibold text-gray-900 py-1.5 bg-transparent border-0 border-b border-gray-200 focus:border-gray-900 focus:outline-none placeholder:text-gray-400 placeholder:font-normal"
+            />
+            <input
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              maxLength={100}
+              placeholder="한 줄 설명 — 카드에 노출돼요"
+              className="w-full mt-3 text-sm text-gray-700 py-1.5 bg-transparent border-0 border-b border-gray-200 focus:border-gray-900 focus:outline-none placeholder:text-gray-400"
             />
           </div>
-          <div className="w-24">
-            <label className="block text-sm font-medium mb-1">연차</label>
+
+          <ResumeSections
+            sections={sections}
+            onChangeBody={updateSectionBody}
+            onAdd={addSection}
+            onDelete={deleteSection}
+          />
+        </div>
+
+        {/* 우: 발행 설정 (작은 화면에선 맨 위) */}
+        <aside className="border rounded-lg p-4 order-1 lg:order-2 lg:sticky lg:top-20">
+          <div className="text-sm font-medium mb-4">발행 설정</div>
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm">공개</span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={isPublic}
+              onClick={() => setIsPublic(!isPublic)}
+              className={`relative w-9 h-5 rounded-full transition-colors ${
+                isPublic ? "bg-black" : "bg-gray-300"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
+                  isPublic ? "translate-x-4" : ""
+                }`}
+              />
+            </button>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-xs text-gray-500 mb-1">직무</label>
+            <input
+              value={jobRole}
+              onChange={(e) => setJobRole(e.target.value)}
+              maxLength={40}
+              placeholder="예: UX 디자이너"
+              className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-xs text-gray-500 mb-1">연차</label>
             <input
               type="number"
               min={0}
@@ -116,7 +190,7 @@ export default function EditResumeForm({ resume }: { resume: Resume }) {
                   e.target.value === "" ? 0 : Number(e.target.value),
                 )
               }
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
+              className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 ${
                 yearsError
                   ? "border-red-400 focus:ring-red-400"
                   : "focus:ring-black"
@@ -126,60 +200,11 @@ export default function EditResumeForm({ resume }: { resume: Resume }) {
               <p className="text-xs text-red-500 mt-1">{yearsError}</p>
             )}
           </div>
-        </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">한 줄 설명</label>
-          <input
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            maxLength={100}
-            placeholder="이 이력서를 한 줄로 소개해보세요 (카드에 노출돼요)"
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-          />
-        </div>
-
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={isPublic}
-            onChange={(e) => setIsPublic(e.target.checked)}
-            className="w-4 h-4"
-          />
-          <div>
-            <div className="text-sm font-medium">공개</div>
-            <div className="text-xs text-gray-500">
-              체크하면 피드에 노출돼 다른 사람이 볼 수 있어요
-            </div>
-          </div>
-        </label>
-
-        <div>
-          <label className="block text-sm font-medium mb-2">내용</label>
-          <ResumeSections
-            sections={sections}
-            onChangeBody={updateSectionBody}
-            onAdd={addSection}
-            onDelete={deleteSection}
-          />
-        </div>
-      </div>
-
-      <div className="flex gap-3 mt-8 pt-6 border-t">
-        <button
-          onClick={handleSave}
-          disabled={isPending || !!yearsError}
-          className="flex-1 px-4 py-2 bg-black text-white rounded-md text-sm font-medium disabled:opacity-50"
-        >
-          {isPending ? "저장 중..." : "저장"}
-        </button>
-        <button
-          onClick={handleDelete}
-          disabled={isPending}
-          className="px-4 py-2 border border-red-300 text-red-600 rounded-md text-sm font-medium hover:bg-red-50 disabled:opacity-50"
-        >
-          삭제
-        </button>
+          <p className="text-xs text-gray-400 leading-relaxed pt-3 border-t">
+            공개 시 이름은 닉네임으로 표시되고, 연락처는 노출되지 않습니다.
+          </p>
+        </aside>
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ type Props = {
   href: string;
   title: string;
   description?: string | null;
+  jobRole?: string | null;
   experienceYears: number;
   nickname: string;
   likeCount: number;
@@ -19,6 +20,7 @@ export default function ResumeCard({
   href,
   title,
   description,
+  jobRole,
   experienceYears,
   nickname,
   likeCount,
@@ -36,6 +38,12 @@ export default function ResumeCard({
     >
       <div className="flex items-center gap-1.5 mb-2 text-xs text-gray-500">
         <span className="font-medium text-gray-700">{nickname}</span>
+        {jobRole && (
+          <>
+            <span aria-hidden>·</span>
+            <span>{jobRole}</span>
+          </>
+        )}
         <span aria-hidden>·</span>
         <span>{formatExperience(experienceYears)}</span>
         {isPublic !== undefined && (
