@@ -25,7 +25,7 @@ export function UserProvider({
 
   const loadProfile = async (userId: string) => {
     const { data, error } = await supabase
-      .from("Profiles")
+      .from("profiles")
       .select("*")
       .eq("id", userId)
       .maybeSingle();

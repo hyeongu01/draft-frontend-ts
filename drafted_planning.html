@@ -1,0 +1,2122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Drafted — 서비스 기획서 + 화면 기획</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+  :root {
+    --bg: #FAF7EE;
+    --bg-deep: #F2EDDF;
+    --surface: #FFFFFF;
+    --ink: #1A1815;
+    --ink-soft: #3D362C;
+    --ink-mute: #6B6359;
+    --ink-faint: #A39B8E;
+    --border: #E5E0D3;
+    --border-strong: #C9C2B0;
+    --accent: #B85C38;
+    --info-bg: #EDE7F5;
+    --info-text: #5B4B8A;
+    --font-display: 'Fraunces', ui-serif, Georgia, serif;
+    --font-sans: 'Pretendard Variable', Pretendard, 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ============= LAYOUT ============= */
+  .layout {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 60px 40px 120px;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  aside.sidebar {
+    position: sticky;
+    top: 60px;
+    align-self: start;
+    padding-right: 16px;
+    border-right: 0.5px solid var(--border);
+  }
+  .sidebar-brand {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin: 0 0 4px;
+    color: var(--ink);
+  }
+  .sidebar-brand em { font-style: italic; color: var(--accent); }
+  .sidebar-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 36px;
+  }
+  .sidebar h2 {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+    margin: 0 0 16px;
+  }
+  .sidebar ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: side-counter;
+  }
+  .sidebar li {
+    counter-increment: side-counter;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 6px 0;
+  }
+  .sidebar li::before {
+    content: counter(side-counter, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    flex-shrink: 0;
+  }
+  .sidebar a {
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    line-height: 1.4;
+    transition: color 0.15s;
+  }
+  .sidebar a:hover { color: var(--accent); }
+
+  main {
+    min-width: 0;
+    max-width: 720px;
+  }
+
+  @media (max-width: 1024px) {
+    .layout {
+      grid-template-columns: 1fr;
+      gap: 32px;
+      padding: 40px 24px 80px;
+    }
+    aside.sidebar {
+      position: static;
+      padding-right: 0;
+      padding-bottom: 24px;
+      border-right: none;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .sidebar ol {
+      columns: 2;
+      column-gap: 24px;
+    }
+    .sidebar li { break-inside: avoid; }
+  }
+
+  /* ============= COVER ============= */
+  .cover {
+    padding: 60px 0 80px;
+    border-bottom: 0.5px solid var(--border-strong);
+    margin-bottom: 64px;
+  }
+  .cover .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 32px;
+  }
+  .cover .title {
+    font-family: var(--font-display);
+    font-size: clamp(56px, 9vw, 96px);
+    line-height: 0.95;
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    margin: 0 0 24px;
+    color: var(--ink);
+  }
+  .cover .title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .cover .subtitle {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--ink-soft);
+    margin: 0 0 56px;
+    line-height: 1.4;
+    max-width: 520px;
+  }
+  .cover .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    font-size: 13px;
+    color: var(--ink-mute);
+  }
+  .cover .meta dt {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 10px;
+    margin-bottom: 4px;
+    color: var(--ink-faint);
+  }
+  .cover .meta dd {
+    margin: 0;
+    color: var(--ink-soft);
+  }
+
+  /* ============= TOC ============= */
+  .toc {
+    background: var(--bg-deep);
+    border-radius: 4px;
+    padding: 28px 32px;
+    margin-bottom: 80px;
+  }
+  .toc h2 {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-mute);
+    margin: 0 0 16px;
+    font-weight: 500;
+  }
+  .toc ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: toc-counter;
+  }
+  .toc li {
+    counter-increment: toc-counter;
+    padding: 8px 0;
+    border-bottom: 0.5px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+  .toc li:last-child { border-bottom: none; }
+  .toc li::before {
+    content: counter(toc-counter, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    min-width: 28px;
+  }
+  .toc a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 14px;
+    flex: 1;
+  }
+  .toc a:hover { color: var(--accent); }
+
+  /* ============= SECTIONS ============= */
+  section {
+    padding: 56px 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+  section:last-of-type { border-bottom: none; }
+  .section-number {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-style: italic;
+    color: var(--accent);
+    margin-bottom: 12px;
+    letter-spacing: 0.05em;
+  }
+  h2.section-title {
+    font-family: var(--font-display);
+    font-size: 44px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0 0 40px;
+    color: var(--ink);
+  }
+  h2.section-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 40px 0 12px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 28px 0 8px;
+    color: var(--ink-soft);
+    letter-spacing: -0.005em;
+  }
+  p {
+    margin: 0 0 18px;
+    color: var(--ink-soft);
+    line-height: 1.75;
+  }
+  ul, ol {
+    margin: 0 0 18px;
+    padding-left: 20px;
+    color: var(--ink-soft);
+    line-height: 1.75;
+  }
+  li { margin-bottom: 6px; }
+  strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+  em {
+    font-style: italic;
+    color: var(--ink);
+  }
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    background: var(--bg-deep);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--ink);
+  }
+
+  /* ============= TABLES ============= */
+  .table-wrap {
+    margin: 24px 0 32px;
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-mute);
+    font-weight: 500;
+    padding: 10px 12px 10px 0;
+    border-bottom: 0.5px solid var(--border-strong);
+  }
+  td {
+    padding: 12px 12px 12px 0;
+    border-bottom: 0.5px solid var(--border);
+    vertical-align: top;
+    color: var(--ink-soft);
+  }
+  td:first-child { font-weight: 500; color: var(--ink); }
+  td code { font-size: 12px; }
+
+  /* ============= CALLOUTS ============= */
+  .callout {
+    background: var(--bg-deep);
+    border-left: 2px solid var(--accent);
+    padding: 16px 20px;
+    margin: 24px 0;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .callout strong { color: var(--ink); }
+
+  /* ============= QUOTE ============= */
+  .pullquote {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 22px;
+    line-height: 1.4;
+    color: var(--ink);
+    padding: 32px 0 32px 28px;
+    margin: 32px 0;
+    border-left: 1px solid var(--accent);
+    max-width: 600px;
+  }
+
+  /* ============= WIREFRAMES ============= */
+  .wireframe {
+    background: var(--bg-deep);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 0.5px solid var(--border);
+    margin: 24px 0 40px;
+    font-family: var(--font-sans);
+  }
+  .wf-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-mute);
+    margin: 0 0 8px;
+    letter-spacing: 0.05em;
+  }
+  .wf-caption {
+    font-size: 13px;
+    color: var(--ink-mute);
+    margin: 16px 0 32px;
+    padding-left: 12px;
+    border-left: 1px solid var(--border-strong);
+    font-style: italic;
+    font-family: var(--font-display);
+  }
+  .wf-urlbar {
+    background: var(--surface);
+    padding: 8px 16px;
+    border-bottom: 0.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .wf-dots { display: flex; gap: 6px; }
+  .wf-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border-strong); }
+  .wf-url {
+    flex: 1;
+    font-size: 12px;
+    color: var(--ink-mute);
+    font-family: var(--font-mono);
+  }
+  .wf-nav {
+    background: var(--surface);
+    padding: 14px 20px;
+    border-bottom: 0.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .wf-nav-left { display: flex; align-items: center; gap: 28px; }
+  .wf-logo { font-size: 15px; font-weight: 600; }
+  .wf-tabs { display: flex; gap: 18px; font-size: 13px; color: var(--ink-mute); }
+  .wf-tab-active {
+    color: var(--ink);
+    font-weight: 500;
+    border-bottom: 1.5px solid var(--ink);
+    padding-bottom: 2px;
+  }
+  .wf-nav-right { display: flex; align-items: center; gap: 14px; }
+  .wf-bell { font-size: 14px; color: var(--ink-mute); }
+  .wf-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--info-bg);
+    color: var(--info-text);
+    font-size: 11px;
+    font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ============= FEED ============= */
+  .wf-filterbar {
+    background: var(--surface);
+    padding: 12px 20px;
+    border-bottom: 0.5px solid var(--border);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .wf-chip {
+    font-size: 12px;
+    padding: 5px 12px;
+    border: 0.5px solid var(--border-strong);
+    border-radius: 999px;
+    color: var(--ink-soft);
+  }
+  .wf-chip-spacer { margin-left: auto; font-size: 12px; color: var(--ink-mute); }
+
+  .wf-grid {
+    padding: 16px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .wf-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .wf-card-author {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 8px;
+  }
+  .wf-avatar-sm {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--bg-deep);
+  }
+  .wf-card-nick { font-size: 12px; font-weight: 500; color: var(--ink); }
+  .wf-card-role { font-size: 11px; color: var(--ink-mute); margin-bottom: 6px; }
+  .wf-card-title { font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 6px; line-height: 1.4; }
+  .wf-card-snippet { font-size: 12px; color: var(--ink-mute); line-height: 1.5; margin-bottom: 14px; }
+  .wf-card-stats {
+    display: flex; gap: 12px;
+    font-size: 11px; color: var(--ink-mute);
+    align-items: center;
+  }
+  .wf-card-stat-end { margin-left: auto; }
+
+  /* ============= DETAIL ============= */
+  .wf-action-bar {
+    background: var(--surface);
+    padding: 14px 20px;
+    border-bottom: 0.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .wf-back { font-size: 13px; color: var(--ink-mute); }
+  .wf-action-buttons { display: flex; gap: 8px; }
+  .wf-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+    border: 0.5px solid var(--border-strong);
+    border-radius: 6px;
+    color: var(--ink-soft);
+  }
+  .wf-btn-primary {
+    background: var(--info-bg);
+    color: var(--info-text);
+    border-color: var(--info-text);
+  }
+
+  .wf-detail-body { padding: 20px; }
+  .wf-detail-author {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 18px;
+  }
+  .wf-avatar-md {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 0.5px solid var(--border-strong);
+  }
+  .wf-detail-name { font-size: 14px; font-weight: 500; }
+  .wf-detail-sub { font-size: 12px; color: var(--ink-mute); }
+  .wf-detail-stats { margin-left: auto; display: flex; gap: 14px; font-size: 12px; color: var(--ink-mute); }
+  .wf-detail-title {
+    font-size: 20px; font-weight: 500;
+    margin: 0 0 24px;
+    color: var(--ink);
+  }
+  .wf-section {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+  }
+  .wf-section-label {
+    font-size: 12px; font-weight: 500;
+    color: var(--ink-mute);
+    margin-bottom: 10px;
+    letter-spacing: 0.02em;
+  }
+  .wf-section-text { font-size: 13px; color: var(--ink-soft); line-height: 1.7; }
+  .wf-timeline-item {
+    border-left: 2px solid var(--border-strong);
+    padding-left: 12px;
+    margin-bottom: 14px;
+  }
+  .wf-timeline-item:last-child { margin-bottom: 0; }
+  .wf-timeline-title { font-size: 13px; font-weight: 500; color: var(--ink); }
+  .wf-timeline-period { font-size: 11px; color: var(--ink-mute); margin: 2px 0 6px; }
+  .wf-timeline-desc { font-size: 12px; line-height: 1.6; color: var(--ink-mute); }
+
+  .wf-project-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+  .wf-project-card {
+    background: var(--bg-deep);
+    border-radius: 6px;
+    padding: 10px;
+  }
+  .wf-project-name { font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+  .wf-project-desc { font-size: 11px; color: var(--ink-mute); line-height: 1.5; }
+
+  .wf-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .wf-tag {
+    font-size: 11px;
+    padding: 3px 9px;
+    background: var(--bg-deep);
+    border-radius: 999px;
+    color: var(--ink-soft);
+  }
+
+  /* ============= EDITOR ============= */
+  .wf-toolbar {
+    background: var(--surface);
+    padding: 12px 20px;
+    border-bottom: 0.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .wf-saved-status { font-size: 13px; color: var(--ink-mute); }
+  .wf-saved-faint { color: var(--ink-faint); }
+  .wf-publish-btn {
+    font-size: 12px; padding: 6px 14px;
+    background: var(--ink);
+    color: var(--bg);
+    border-radius: 6px;
+  }
+  .wf-editor-grid {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 200px;
+    gap: 16px;
+    align-items: start;
+  }
+  .wf-editor-title {
+    font-size: 20px; font-weight: 500;
+    color: var(--ink);
+    padding: 4px 0;
+    margin-bottom: 20px;
+    border: none;
+    background: transparent;
+  }
+  .wf-block {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .wf-block-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .wf-block-title { font-size: 12px; font-weight: 500; color: var(--ink-mute); }
+  .wf-add { font-size: 11px; color: var(--ink-faint); }
+  .wf-block-placeholder { font-size: 13px; color: var(--ink-faint); line-height: 1.6; min-height: 24px; }
+  .wf-add-section {
+    text-align: center;
+    padding: 10px;
+    border: 0.5px dashed var(--border-strong);
+    border-radius: 8px;
+    color: var(--ink-faint);
+    font-size: 12px;
+  }
+  .wf-settings {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .wf-settings-title { font-size: 12px; font-weight: 500; color: var(--ink-mute); margin-bottom: 12px; }
+  .wf-toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+    font-size: 12px;
+  }
+  .wf-toggle {
+    width: 28px; height: 16px;
+    background: var(--info-bg);
+    border-radius: 999px;
+    position: relative;
+  }
+  .wf-toggle::after {
+    content: '';
+    position: absolute; top: 2px; right: 2px;
+    width: 12px; height: 12px;
+    background: white; border-radius: 50%;
+  }
+  .wf-select-label { font-size: 11px; color: var(--ink-mute); margin-bottom: 4px; }
+  .wf-select {
+    font-size: 12px; padding: 6px 10px;
+    border: 0.5px solid var(--border-strong);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .wf-settings-note {
+    font-size: 11px; color: var(--ink-faint);
+    line-height: 1.5; padding-top: 8px;
+    border-top: 0.5px solid var(--border);
+  }
+
+  /* ============= CHAT ROOM ============= */
+  .wf-chat-grid {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    min-height: 480px;
+  }
+  .wf-chat-sidebar {
+    background: var(--surface);
+    border-right: 0.5px solid var(--border);
+  }
+  .wf-chat-search {
+    padding: 14px 14px 10px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .wf-chat-search-title { font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+  .wf-search-box {
+    background: var(--bg-deep);
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+  .wf-chat-item {
+    padding: 10px 14px;
+  }
+  .wf-chat-item.active {
+    background: var(--bg-deep);
+    border-left: 2px solid var(--ink);
+  }
+  .wf-chat-item-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 4px;
+  }
+  .wf-chat-item-avatar {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--bg-deep);
+  }
+  .wf-chat-item-name {
+    font-size: 12px; font-weight: 500; flex: 1;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .wf-chat-item-time { font-size: 10px; color: var(--ink-faint); }
+  .wf-chat-item-preview {
+    font-size: 11px; color: var(--ink-mute);
+    padding-left: 34px; line-height: 1.4;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .wf-chat-main { background: var(--surface); display: flex; flex-direction: column; }
+  .wf-chat-header {
+    padding: 12px 16px;
+    border-bottom: 0.5px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .wf-chat-header-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--bg-deep);
+  }
+  .wf-chat-context {
+    padding: 8px 16px;
+    background: var(--bg-deep);
+    border-bottom: 0.5px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; color: var(--ink-mute);
+  }
+  .wf-chat-messages {
+    flex: 1; padding: 16px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .wf-msg-date { font-size: 10px; color: var(--ink-faint); text-align: center; margin: 4px 0; }
+  .wf-msg {
+    max-width: 78%;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .wf-msg-them {
+    align-self: flex-start;
+    background: var(--bg-deep);
+    border-top-left-radius: 4px;
+    color: var(--ink);
+  }
+  .wf-msg-me {
+    align-self: flex-end;
+    background: var(--info-bg);
+    color: var(--info-text);
+    border-top-right-radius: 4px;
+  }
+  .wf-chat-input {
+    padding: 10px 14px;
+    border-top: 0.5px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .wf-input-box {
+    flex: 1;
+    background: var(--bg-deep);
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+
+  /* ============= MYPAGE ============= */
+  .wf-profile {
+    padding: 22px 24px 18px;
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+    display: flex; gap: 16px; align-items: center;
+  }
+  .wf-profile-avatar {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--bg-deep);
+    border: 0.5px solid var(--border-strong);
+  }
+  .wf-profile-info { flex: 1; }
+  .wf-profile-name { font-size: 16px; font-weight: 500; margin-bottom: 2px; }
+  .wf-profile-sub { font-size: 12px; color: var(--ink-mute); }
+  .wf-mypage-tabs {
+    background: var(--surface);
+    padding: 0 24px;
+    border-bottom: 0.5px solid var(--border);
+    display: flex; gap: 4px;
+  }
+  .wf-mypage-tab {
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--ink-mute);
+  }
+  .wf-mypage-tab.active {
+    color: var(--ink);
+    font-weight: 500;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: -1px;
+  }
+  .wf-mypage-tab-count { color: var(--ink-faint); font-weight: 400; }
+  .wf-resume-list {
+    padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .wf-resume-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .wf-resume-head {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 8px;
+  }
+  .wf-resume-meta-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 4px;
+  }
+  .wf-badge-current {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: var(--info-bg);
+    color: var(--info-text);
+    border-radius: 999px;
+    font-weight: 500;
+  }
+  .wf-resume-period { font-size: 11px; color: var(--ink-faint); }
+  .wf-resume-title { font-size: 15px; font-weight: 500; color: var(--ink); }
+  .wf-visibility {
+    font-size: 11px;
+    padding: 3px 9px;
+    border: 0.5px solid var(--border-strong);
+    border-radius: 999px;
+    color: var(--ink-mute);
+  }
+  .wf-visibility-private {
+    background: var(--bg-deep);
+    border: none;
+    color: var(--ink-faint);
+  }
+  .wf-resume-desc { font-size: 12px; color: var(--ink-mute); line-height: 1.5; margin-bottom: 12px; }
+  .wf-resume-stats {
+    display: flex; gap: 14px;
+    font-size: 11px; color: var(--ink-faint);
+    align-items: center;
+  }
+  .wf-edit-link {
+    margin-left: auto;
+    color: var(--info-text);
+  }
+
+  /* ============= CHAT LIST ============= */
+  .wf-chats-header {
+    padding: 18px 24px 14px;
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .wf-chats-title { font-size: 17px; font-weight: 500; margin-bottom: 14px; }
+  .wf-chats-search {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-deep);
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+  .wf-chats-list { background: var(--surface); }
+  .wf-chats-item {
+    padding: 14px 24px;
+    display: flex; align-items: flex-start; gap: 12px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .wf-chats-item:last-child { border-bottom: none; }
+  .wf-chats-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--bg-deep);
+    flex-shrink: 0;
+  }
+  .wf-chats-body { flex: 1; min-width: 0; }
+  .wf-chats-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 3px;
+  }
+  .wf-chats-name { font-size: 13px; font-weight: 500; }
+  .wf-chats-time { font-size: 11px; color: var(--ink-faint); }
+  .wf-chats-time.unread { color: var(--info-text); font-weight: 500; }
+  .wf-chats-context { font-size: 11px; color: var(--ink-faint); margin-bottom: 4px; }
+  .wf-chats-preview {
+    font-size: 12px;
+    color: var(--ink-mute);
+    line-height: 1.4;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .wf-chats-preview.unread { color: var(--ink); font-weight: 500; }
+  .wf-unread-badge {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--info-text);
+    color: white;
+    font-size: 10px; font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .wf-chats-footer {
+    padding: 24px;
+    text-align: center;
+    background: var(--surface);
+    border-top: 0.5px solid var(--border);
+    font-size: 11px;
+    color: var(--ink-faint);
+    line-height: 1.6;
+  }
+
+  /* ============= FLOW DIAGRAM ============= */
+  .flow {
+    background: var(--bg-deep);
+    padding: 28px 32px;
+    border-radius: 4px;
+    margin: 24px 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 2;
+    color: var(--ink-soft);
+    white-space: pre-wrap;
+  }
+  .flow-title {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  /* ============= ERD ============= */
+  .erd {
+    background: var(--bg-deep);
+    padding: 24px;
+    border-radius: 4px;
+    margin: 24px 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+  .entity {
+    background: var(--surface);
+    border: 0.5px solid var(--border-strong);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .entity-name {
+    background: var(--bg-deep);
+    padding: 8px 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    border-bottom: 0.5px solid var(--border);
+    color: var(--ink);
+  }
+  .entity-field {
+    padding: 6px 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-soft);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .entity-field:last-child { border-bottom: none; }
+  .entity-field .key { color: var(--accent); font-weight: 600; font-size: 9px; margin-right: 6px; }
+
+  /* ============= AUTH (LOGIN / ONBOARDING) ============= */
+  .wf-auth-center {
+    padding: 80px 20px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 460px;
+  }
+  .wf-auth-brand {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .wf-auth-brand-name {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .wf-auth-brand-tagline {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-mute);
+  }
+  .wf-auth-form {
+    width: 100%;
+    max-width: 340px;
+  }
+  .wf-auth-form h1.wf-auth-heading {
+    font-family: var(--font-sans);
+    font-size: 20px;
+    font-weight: 500;
+    margin: 0 0 6px;
+    text-align: center;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .wf-auth-form .wf-auth-sub {
+    font-size: 13px;
+    color: var(--ink-mute);
+    text-align: center;
+    margin: 0 0 32px;
+    line-height: 1.6;
+  }
+  .wf-oauth-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .wf-oauth-btn {
+    border: 0.5px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .wf-oauth-btn.dark {
+    background: #18181B;
+    color: #FAFAFA;
+    border-color: #18181B;
+  }
+  .wf-oauth-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  .wf-google-mark {
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, #4285F4 0% 25%, #34A853 25% 50%, #FBBC05 50% 75%, #EA4335 75% 100%);
+  }
+  .wf-terms-note {
+    font-size: 11px;
+    color: var(--ink-mute);
+    text-align: center;
+    line-height: 1.7;
+  }
+  .wf-terms-note u {
+    text-decoration: underline;
+    color: var(--ink-soft);
+  }
+  .wf-onb-avatar-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+  .wf-onb-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 0.5px solid var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-size: 28px;
+    color: var(--ink-faint);
+  }
+  .wf-onb-avatar-edit {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 0.5px solid var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--ink-mute);
+  }
+  .wf-onb-field {
+    margin-bottom: 28px;
+  }
+  .wf-onb-label {
+    font-size: 12px;
+    color: var(--ink-mute);
+    margin-bottom: 6px;
+  }
+  .wf-onb-input {
+    border: 0.5px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    background: var(--surface);
+    color: var(--ink);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .wf-onb-check {
+    color: #16A34A;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .wf-onb-help {
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-top: 6px;
+    padding-left: 2px;
+    line-height: 1.5;
+  }
+  .wf-onb-submit {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 13px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .wf-onb-foot {
+    font-size: 11px;
+    color: var(--ink-mute);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  /* ============= FOOTER ============= */
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 0.5px solid var(--border-strong);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    main { padding: 40px 20px 80px; }
+    .cover { padding: 30px 0 50px; margin-bottom: 40px; }
+    h2.section-title { font-size: 32px; }
+    .wf-editor-grid { grid-template-columns: 1fr; }
+    .wf-chat-grid { grid-template-columns: 1fr; min-height: auto; }
+    .wf-chat-sidebar { display: none; }
+    .wf-grid { grid-template-columns: 1fr; }
+    .wf-project-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<aside class="sidebar">
+  <h1 class="sidebar-brand">Drafted<em>.</em></h1>
+  <div class="sidebar-meta">서비스 기획 v1.0</div>
+  <h2>목차</h2>
+  <ol>
+    <li><a href="#overview">서비스 개요</a></li>
+    <li><a href="#target">타겟 사용자</a></li>
+    <li><a href="#mvp">MVP 범위</a></li>
+    <li><a href="#flow">사용자 흐름</a></li>
+    <li><a href="#screens">화면 기획 + 와이어프레임</a></li>
+    <li><a href="#data">데이터 모델</a></li>
+    <li><a href="#stack">기술 스택</a></li>
+    <li><a href="#learning">학습 로드맵</a></li>
+    <li><a href="#dev">개발 로드맵</a></li>
+    <li><a href="#risks">결정 포인트 / 리스크</a></li>
+  </ol>
+</aside>
+
+<main>
+
+<!-- ====================== COVER ====================== -->
+<header class="cover">
+  <div class="eyebrow">서비스 기획 + 화면 기획 · v1.0</div>
+  <h1 class="title">Drafted<em>.</em></h1>
+  <p class="subtitle">커리어를 시기별로 정리하고, 공유하고, 피드백 받는 곳.</p>
+  <dl class="meta">
+    <div>
+      <dt>유형</dt>
+      <dd>웹 서비스 (MVP)</dd>
+    </div>
+    <div>
+      <dt>타겟</dt>
+      <dd>이직 준비 직장인</dd>
+    </div>
+    <div>
+      <dt>예상 일정</dt>
+      <dd>4–6주</dd>
+    </div>
+    <div>
+      <dt>개발 인력</dt>
+      <dd>1인 풀스택</dd>
+    </div>
+  </dl>
+</header>
+
+<!-- ====================== 1. 서비스 개요 ====================== -->
+<section id="overview">
+  <div class="section-number">§ 01</div>
+  <h2 class="section-title">서비스 <em>개요</em></h2>
+
+  <h3>한 줄 정의</h3>
+  <p>직장인이 시기별로 이력서를 쌓아가며 공유하고, 또래에게 피드백을 받는 커리어 커뮤니티 서비스.</p>
+
+  <p class="pullquote">이력서는 한 번 쓰고 끝나는 문서가 아니라, 커리어가 진행되면서 계속 갱신되는 살아있는 기록이다.</p>
+
+  <h3>해결하려는 문제</h3>
+  <ul>
+    <li>이직 시점마다 이력서를 처음부터 다시 쓰는 마찰</li>
+    <li>본인 이력서가 객관적으로 잘 쓴 것인지 판단할 채널 부재</li>
+    <li>같은 직무·연차 동료의 실제 이력서를 참고할 수 없음</li>
+    <li>1:1 멘토링 서비스는 비용·접근성 문제로 부담</li>
+  </ul>
+
+  <h3>해결 방식</h3>
+  <ul>
+    <li>회사·시기별로 이력서를 독립된 카드로 누적 (커리어 버전 관리)</li>
+    <li>각 이력서를 공개·비공개 단위로 토글, 또래 풀에 노출</li>
+    <li>가벼운 반응(좋아요)과 저장(보관)으로 인사이트 축적</li>
+    <li>깊은 피드백은 1:1 채팅, 채팅 컨텍스트에 어떤 이력서에 대한 대화인지 명시</li>
+  </ul>
+
+  <h3>경쟁 서비스 대비 차별화</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>서비스</th><th>중심 가치</th><th>본 서비스와의 차이</th></tr></thead>
+      <tbody>
+        <tr><td>잡코리아 · 사람인</td><td>채용공고</td><td>이력서 자체를 공유하지 않음</td></tr>
+        <tr><td>링커리어 · 잇다</td><td>현직자 멘토링</td><td>유료, 또래 피드백 아님</td></tr>
+        <tr><td>LinkedIn</td><td>네트워킹</td><td>이력서 버전 관리 부재, 비공개 피드백 어려움</td></tr>
+        <tr><td><strong>Drafted</strong></td><td>또래 간 커리어 누적·공유</td><td>버전 관리 + 진입장벽 낮은 피드백</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ====================== 2. 타겟 사용자 ====================== -->
+<section id="target">
+  <div class="section-number">§ 02</div>
+  <h2 class="section-title">타겟 <em>사용자</em></h2>
+
+  <h3>1차 페르소나</h3>
+  <p>이직을 고려 중이거나, 이미 여러 회사를 거친 2~10년차 직장인. IT·디자인·기획 직군이 초기 집중 대상.</p>
+
+  <h3>사용 시나리오</h3>
+  <ol>
+    <li>회사를 옮길 때 현 직장에서의 경험을 정리해 새 이력서를 추가한다.</li>
+    <li>비슷한 직무·연차의 또래 이력서를 피드에서 둘러본다.</li>
+    <li>마음에 드는 이력서에 좋아요, 참고할 것은 보관한다.</li>
+    <li>구체적 피드백이 필요하면 작성자에게 채팅을 건다.</li>
+    <li>본인 이력서에 다른 사람이 좋아요·보관을 누르면 받은 반응을 마이페이지에서 확인한다.</li>
+  </ol>
+</section>
+
+<!-- ====================== 3. MVP 범위 ====================== -->
+<section id="mvp">
+  <div class="section-number">§ 03</div>
+  <h2 class="section-title">MVP <em>범위</em></h2>
+
+  <h3>포함 기능</h3>
+  <ol>
+    <li>회원가입·로그인 (이메일 + 카카오·구글 소셜)</li>
+    <li>이력서 작성 (Tiptap 기반 자체 에디터)</li>
+    <li>여러 이력서 누적·관리 (시기별 카드)</li>
+    <li>피드 (최신순·인기순)</li>
+    <li>좋아요</li>
+    <li>보관 (북마크)</li>
+    <li>1:1 채팅 (실시간)</li>
+    <li>마이페이지 (내 이력서 / 보관함 / 좋아요 / 받은 피드백)</li>
+    <li>직무 + 연차 필터</li>
+  </ol>
+
+  <h3>제외 기능 (v2 이후)</h3>
+  <ul>
+    <li>PDF 업로드 — 검색·표준화 어려움, 자체 에디터로 통일</li>
+    <li>공개 댓글 — 채팅으로 피드백 동선 단일화</li>
+    <li>대학생 등 신원 인증</li>
+    <li>AI 피드백 · 자동 추천</li>
+    <li>합격자 이력서 인증 뱃지</li>
+  </ul>
+
+  <div class="callout">
+    <strong>PDF 업로드 제외 이유</strong> — 자체 에디터로 통일하면 데이터가 구조화되어 후일 AI 피드백·추천·검색 고도화의 기반이 된다. 초기엔 사용자 마찰이 있지만 장기 가치가 훨씬 크다.
+  </div>
+</section>
+
+<!-- ====================== 4. 사용자 흐름 ====================== -->
+<section id="flow">
+  <div class="section-number">§ 04</div>
+  <h2 class="section-title">사용자 <em>흐름</em></h2>
+
+  <h3>신규 사용자 — 첫 이력서 작성부터 피드백 수신까지</h3>
+  <div class="flow">
+<span class="flow-title">First-time user flow</span>/login  →  Google 또는 GitHub 선택
+   ↓
+/auth/callback  (OAuth 토큰 교환)
+   ↓
+/onboarding  →  닉네임 설정
+   ↓
+/me       (빈 상태 · 첫 이력서 CTA)
+   ↓
+/me/resumes/new  →  제목 입력
+   ↓
+/me/resumes/[id]/edit  →  섹션 추가 · 공개 토글
+   ↓
+/me       (이력서 카드 1개)
+   ↓
+/         피드에서 다른 이력서 둘러보기
+   ↓
+/resumes/[id]  →  "피드백 요청"
+   ↓
+/chats/[id]    →  첫 대화 시작
+  </div>
+
+  <h3>기존 사용자 — 새 회사 합류 후 이력서 추가</h3>
+  <div class="flow">
+<span class="flow-title">Returning user flow</span>/me  (기존 이력서 카드 N개)
+   ↓
+[+ 새 이력서]  →  /me/resumes/new
+   ↓
+편집 → 새 챕터 카드가 /me에 추가
+   ↓
+공개 토글 → 피드에 노출
+  </div>
+</section>
+
+<!-- ====================== 5. 화면 기획 ====================== -->
+<section id="screens">
+  <div class="section-number">§ 05</div>
+  <h2 class="section-title">화면 <em>기획</em></h2>
+
+  <h3>전체 화면 목록</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>경로</th><th>화면</th><th>인증</th><th>우선순위</th></tr></thead>
+      <tbody>
+        <tr><td><code>/</code></td><td>메인 피드</td><td>선택</td><td>P0</td></tr>
+        <tr><td><code>/explore</code></td><td>탐색·검색</td><td>선택</td><td>P1</td></tr>
+        <tr><td><code>/resumes/[id]</code></td><td>이력서 상세 (공개)</td><td>선택</td><td>P0</td></tr>
+        <tr><td><code>/me</code></td><td>내 대시보드</td><td>필수</td><td>P0</td></tr>
+        <tr><td><code>/me/resumes/new</code></td><td>새 이력서 작성</td><td>필수</td><td>P0</td></tr>
+        <tr><td><code>/me/resumes/[id]/edit</code></td><td>이력서 편집</td><td>필수</td><td>P0</td></tr>
+        <tr><td><code>/me/saved</code></td><td>보관함</td><td>필수</td><td>P1</td></tr>
+        <tr><td><code>/me/liked</code></td><td>좋아요 목록</td><td>필수</td><td>P2</td></tr>
+        <tr><td><code>/me/feedback</code></td><td>받은 피드백</td><td>필수</td><td>P1</td></tr>
+        <tr><td><code>/chats</code></td><td>채팅 목록</td><td>필수</td><td>P1</td></tr>
+        <tr><td><code>/chats/[id]</code></td><td>채팅방</td><td>필수</td><td>P1</td></tr>
+        <tr><td><code>/login</code></td><td>로그인 (Google · GitHub OAuth)</td><td>비로그인만</td><td>P0</td></tr>
+        <tr><td><code>/onboarding</code></td><td>온보딩 (닉네임 설정)</td><td>OAuth 직후</td><td>P0</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============ LOGIN WIREFRAME ============ -->
+  <h3>① 로그인 — <code>/login</code></h3>
+  <p>OAuth 전용. 이메일·비밀번호 없이 Google·GitHub 두 가지 선택지만 제공. "로그인"과 "회원가입"을 구분하지 않고 한 화면으로 통합.</p>
+  <p class="wf-meta">/login</p>
+  <div class="wireframe">
+    <div class="wf-urlbar">
+      <div class="wf-dots"><span class="wf-dot"></span><span class="wf-dot"></span><span class="wf-dot"></span></div>
+      <div class="wf-url">drafted.app/login</div>
+    </div>
+    <div class="wf-auth-center">
+      <div class="wf-auth-brand">
+        <div class="wf-auth-brand-name">drafted</div>
+        <div class="wf-auth-brand-tagline">이력서는 영원히 초안</div>
+      </div>
+      <div class="wf-auth-form">
+        <h1 class="wf-auth-heading">시작해볼까요</h1>
+        <p class="wf-auth-sub">아래 방법으로 가입·로그인하세요</p>
+        <div class="wf-oauth-buttons">
+          <div class="wf-oauth-btn">
+            <span class="wf-oauth-icon wf-google-mark"></span>
+            <span>Google로 계속하기</span>
+          </div>
+          <div class="wf-oauth-btn dark">
+            <svg class="wf-oauth-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+            </svg>
+            <span>GitHub으로 계속하기</span>
+          </div>
+        </div>
+        <div class="wf-terms-note">
+          계속 진행하면 <u>이용약관</u> 및<br/>
+          <u>개인정보처리방침</u>에 동의하는 것으로 간주됩니다.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wf-caption">"로그인"·"회원가입" 라벨을 의도적으로 안 씁니다 — OAuth는 둘을 자동으로 처리하니까 사용자도 구분할 필요가 없어요. 약관 동의는 별도 체크박스 대신 버튼 클릭이 곧 동의.</div>
+
+  <!-- ============ ONBOARDING WIREFRAME ============ -->
+  <h3>② 온보딩 — <code>/onboarding</code></h3>
+  <p>OAuth 직후 닉네임 한 개만 받는 가벼운 단계. 직무·연차는 첫 이력서 작성 시 자연스럽게 수집되므로 여기서 받지 않음.</p>
+  <p class="wf-meta">/onboarding</p>
+  <div class="wireframe">
+    <div class="wf-urlbar">
+      <div class="wf-dots"><span class="wf-dot"></span><span class="wf-dot"></span><span class="wf-dot"></span></div>
+      <div class="wf-url">drafted.app/onboarding</div>
+    </div>
+    <div class="wf-auth-center">
+      <div class="wf-auth-brand">
+        <div class="wf-auth-brand-name">drafted</div>
+      </div>
+      <div class="wf-auth-form">
+        <h1 class="wf-auth-heading">환영해요 👋</h1>
+        <p class="wf-auth-sub">마지막 단계예요.<br/>다른 사람에게 보일 이름을 정해주세요.</p>
+        <div class="wf-onb-avatar-wrap">
+          <div class="wf-onb-avatar">
+            <span>👤</span>
+            <div class="wf-onb-avatar-edit">📷</div>
+          </div>
+        </div>
+        <div class="wf-onb-field">
+          <div class="wf-onb-label">닉네임</div>
+          <div class="wf-onb-input">
+            <span>design_lee</span>
+            <span class="wf-onb-check">✓</span>
+          </div>
+          <div class="wf-onb-help">이력서 공개 시 본명 대신 표시됩니다 · 영문·숫자·언더스코어, 2~20자</div>
+        </div>
+        <div class="wf-onb-submit">Drafted 시작하기</div>
+        <div class="wf-onb-foot">닉네임은 마이페이지에서 언제든 변경할 수 있어요.</div>
+      </div>
+    </div>
+  </div>
+  <div class="wf-caption">아바타는 OAuth 프로필 사진을 자동 임포트해 기본값으로. 닉네임은 입력 중 실시간 중복 검증 (초록 체크). "마지막 단계"라는 문구로 사용자가 또 다른 폼을 예상해 이탈하지 않게.</div>
+
+  <!-- ============ FEED WIREFRAME ============ -->
+  <h3>③ 메인 피드 — <code>/</code></h3>
+  <p>사용자가 가장 처음 만나는 화면. 직무·연차 필터로 빠르게 좁히고, 카드 그리드에서 좋아요·보관 수가 한눈에 보이게 함.</p>
+  <p class="wf-meta">/feed</p>
+  <div class="wireframe">
+    <div class="wf-urlbar">
+      <div class="wf-dots"><span class="wf-dot"></span><span class="wf-dot"></span><span class="wf-dot"></span></div>
+      <div class="wf-url">drafted.app/</div>
+    </div>
+    <div class="wf-nav">
+      <div class="wf-nav-left">
+        <span class="wf-logo">drafted</span>
+        <nav class="wf-tabs">
+          <span class="wf-tab-active">피드</span>
+          <span>탐색</span>
+          <span>채팅</span>
+        </nav>
+      </div>
+      <div class="wf-nav-right">
+        <span class="wf-bell">🔔</span>
+        <div class="wf-avatar">U</div>
+      </div>
+    </div>
+    <div class="wf-filterbar">
+      <span class="wf-chip">직무: 전체 ▾</span>
+      <span class="wf-chip">연차: 5년차 ▾</span>
+      <span class="wf-chip-spacer">최신순 ▾</span>
+    </div>
+    <div class="wf-grid">
+      <div class="wf-card">
+        <div class="wf-card-author"><div class="wf-avatar-sm"></div><span class="wf-card-nick">design_lee</span></div>
+        <div class="wf-card-role">UX 디자이너 · 5년차</div>
+        <div class="wf-card-title">시니어로 점프하기 위한 5년의 정리</div>
+        <div class="wf-card-snippet">B2B SaaS 디자인 시스템 리드, 신규 온보딩 플로우…</div>
+        <div class="wf-card-stats"><span>♡ 87</span><span>🔖 34</span><span class="wf-card-stat-end">👁 521</span></div>
+      </div>
+      <div class="wf-card">
+        <div class="wf-card-author"><div class="wf-avatar-sm"></div><span class="wf-card-nick">개발자_김</span></div>
+        <div class="wf-card-role">프론트엔드 · 3년차</div>
+        <div class="wf-card-title">React 포트폴리오로 정리한 3년</div>
+        <div class="wf-card-snippet">실무 프로젝트 4개와 사이드 프로젝트 2개로 구성…</div>
+        <div class="wf-card-stats"><span>♡ 42</span><span>🔖 18</span><span class="wf-card-stat-end">👁 312</span></div>
+      </div>
+      <div class="wf-card">
+        <div class="wf-card-author"><div class="wf-avatar-sm"></div><span class="wf-card-nick">backend_jay</span></div>
+        <div class="wf-card-role">백엔드 · 2년차</div>
+        <div class="wf-card-title">스타트업에서 대기업으로의 이직 준비</div>
+        <div class="wf-card-snippet">Spring Boot 기반 프로젝트 3개, 알고리즘 풀이…</div>
+        <div class="wf-card-stats"><span>♡ 28</span><span>🔖 12</span><span class="wf-card-stat-end">👁 198</span></div>
+      </div>
+      <div class="wf-card">
+        <div class="wf-card-author"><div class="wf-avatar-sm"></div><span class="wf-card-nick">pm_park</span></div>
+        <div class="wf-card-role">서비스 기획 · 4년차</div>
+        <div class="wf-card-title">기획자의 PM 전환기</div>
+        <div class="wf-card-snippet">사용자 리서치, 데이터 분석, 백로그 관리…</div>
+        <div class="wf-card-stats"><span>♡ 56</span><span>🔖 23</span><span class="wf-card-stat-end">👁 387</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="wf-caption">카드에 닉네임·직무·연차만 노출하고 학교·회사명은 상세에서만 표시 — "내용 먼저, 배경은 참고" 순서를 강제하기 위함.</div>
+
+  <!-- ============ DETAIL WIREFRAME ============ -->
+  <h3>④ 이력서 상세 — <code>/resumes/[id]</code></h3>
+  <p>액션 버튼(좋아요·보관·채팅)을 상단에 고정. 다 읽고 다시 위로 돌아가는 마찰을 없앰.</p>
+  <p class="wf-meta">/resumes/r_8a3f</p>
+  <div class="wireframe">
+    <div class="wf-urlbar">
+      <div class="wf-dots"><span class="wf-dot"></span><span class="wf-dot"></span><span class="wf-dot"></span></div>
+      <div class="wf-url">drafted.app/resumes/r_8a3f</div>
+    </div>
+    <div class="wf-action-bar">
+      <div class="wf-back">← 피드로 돌아가기</div>
+      <div class="wf-action-buttons">
+        <span class="wf-btn">♡ 87</span>
+        <span class="wf-btn">🔖 보관</span>
+        <span class="wf-btn wf-btn-primary">💬 채팅으로 피드백 요청</span>
+      </div>
+    </div>
+    <div class="wf-detail-body">
+      <div class="wf-detail-author">
+        <div class="wf-avatar-md"></div>
+        <div>
+          <div class="wf-detail-name">design_lee</div>
+          <div class="wf-detail-sub">UX 디자이너 · 5년차 · 2일 전</div>
+        </div>
+        <div class="wf-detail-stats"><span>👁 521</span><span>🔖 34</span></div>
+      </div>
+      <h1 class="wf-detail-title">시니어로 점프하기 위한 5년의 정리</h1>
+      <div class="wf-section">
+        <div class="wf-section-label">자기소개</div>
+        <div class="wf-section-text">사용자 인터뷰부터 디자인 시스템까지 폭넓게 경험한 디자이너입니다. 데이터에 기반한 결정을 좋아하고…</div>
+      </div>
+      <div class="wf-section">
+        <div class="wf-section-label">경력</div>
+        <div class="wf-timeline-item">
+          <div class="wf-timeline-title">○○ 스타트업 — 시니어 UX 디자이너</div>
+          <div class="wf-timeline-period">2024.03 — 현재</div>
+          <div class="wf-timeline-desc">B2B SaaS 디자인 시스템 v2 리드, 신규 온보딩 플로우 설계로 전환율 30%p 향상…</div>
+        </div>
+        <div class="wf-timeline-item">
+          <div class="wf-timeline-title">○○ 에이전시 — UX 디자이너</div>
+          <div class="wf-timeline-period">2021.06 — 2024.02</div>
+          <div class="wf-timeline-desc">클라이언트 프로젝트 12건 리딩, 사용자 리서치 방법론 표준화…</div>
+        </div>
+      </div>
+      <div class="wf-section">
+        <div class="wf-section-label">프로젝트</div>
+        <div class="wf-project-grid">
+          <div class="wf-project-card">
+            <div class="wf-project-name">디자인 시스템 v2</div>
+            <div class="wf-project-desc">토큰 설계 · 컴포넌트 60개 · 문서화</div>
+          </div>
+          <div class="wf-project-card">
+            <div class="wf-project-name">온보딩 플로우 개선</div>
+            <div class="wf-project-desc">리서치 → 와이어 → 측정 (전환율 30%p ↑)</div>
+          </div>
+        </div>
+      </div>
+      <div class="wf-section">
+        <div class="wf-section-label">스킬</div>
+        <div class="wf-tags">
+          <span class="wf-tag">Figma</span>
+          <span class="wf-tag">Protopie</span>
+          <span class="wf-tag">디자인 시스템</span>
+          <span class="wf-tag">사용자 리서치</span>
+          <span class="wf-tag">데이터 분석</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wf-caption">상단 액션 바는 데스크톱에서 고정형, 모바일에선 하단 고정 바로 변환.</div>
+
+  <!-- ============ EDITOR WIREFRAME ============ -->
+  <h3>⑤ 이력서 작성 — <code>/me/resumes/[id]/edit</code></h3>
+  <p>노션 스타일 섹션 블록 에디터. 우측 상단 패널에 공개 토글·직무·연차를 모아둬 발행 전 한 번에 확인.</p>
+  <p class="wf-meta">/me/resumes/new</p>
+  <div class="wireframe">
+    <div class="wf-urlbar">
+      <div class="wf-dots"><span class="wf-dot"></span><span class="wf-dot"></span><span class="wf-dot"></span></div>
+      <div class="wf-url">drafted.app/me/resumes/new</div>
+    </div>
+    <div class="wf-toolbar">
+      <div class="wf-saved-status">새 이력서 · <span class="wf-saved-faint">자동저장됨 · 방금</span></div>
+      <div class="wf-action-buttons">
+        <span class="wf-btn">미리보기</span>
+        <span class="wf-publish-btn">공개로 게시</span>
+      </div>
+    </div>
+    <div class="wf-editor-grid">
+      <div>
+        <div class="wf-editor-title">이력서 제목 (예: 시니어로 점프하기 위한 5년의 정리)</div>
+        <div class="wf-block">
+          <div class="wf-block-header"><div class="wf-block-title">자기소개</div></div>
+          <div class="wf-block-placeholder">한 두 문장으로 본인을 소개해보세요…</div>
+        </div>
+        <div class="wf-block">
+          <div class="wf-block-header"><div class="wf-block-title">경력</div><span class="wf-add">+ 추가</span></div>
+          <div class="wf-timeline-item">
+            <div class="wf-timeline-title" style="color: var(--ink-faint);">회사 / 직무</div>
+            <div class="wf-timeline-period">기간 (예: 2024.06 – 현재)</div>
+            <div class="wf-timeline-desc">담당 업무와 성과를 적어보세요…</div>
+          </div>
+        </div>
+        <div class="wf-block">
+          <div class="wf-block-header"><div class="wf-block-title">프로젝트</div><span class="wf-add">+ 추가</span></div>
+        </div>
+        <div class="wf-block">
+          <div class="wf-block-header"><div class="wf-block-title">학력</div><span class="wf-add">+ 추가</span></div>
+        </div>
+        <div class="wf-block">
+          <div class="wf-block-header"><div class="wf-block-title">스킬</div><span class="wf-add">+ 추가</span></div>
+        </div>
+        <div class="wf-add-section">+ 섹션 추가</div>
+      </div>
+      <div class="wf-settings">
+        <div class="wf-settings-title">발행 설정</div>
+        <div class="wf-toggle-row"><span>공개</span><span class="wf-toggle"></span></div>
+        <div>
+          <div class="wf-select-label">직무</div>
+          <div class="wf-select"><span>UX 디자이너</span><span>▾</span></div>
+        </div>
+        <div>
+          <div class="wf-select-label">연차</div>
+          <div class="wf-select"><span>5년차</span><span>▾</span></div>
+        </div>
+        <div class="wf-settings-note">공개 시 이름은 닉네임으로 표시되고, 연락처는 노출되지 않습니다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="wf-caption">발행 패널의 개인정보 안내 문구는 §10 개인정보 정책을 UI에서 강제하기 위한 장치.</div>
+
+  <!-- ============ MYPAGE WIREFRAME ============ -->
+  <h3>⑥ 마이페이지 — <code>/me</code></h3>
+  <p>서비스 동선의 중심축. 시기별 이력서 카드가 누적되고, 탭으로 보관함·좋아요·받은 피드백을 한 군데서 관리.</p>
+  <p class="wf-meta">/me</p>
+  <div class="wireframe">
+    <div class="wf-urlbar">
+      <div class="wf-dots"><span class="wf-dot"></span><span class="wf-dot"></span><span class="wf-dot"></span></div>
+      <div class="wf-url">drafted.app/me</div>
+    </div>
+    <div class="wf-nav">
+      <div class="wf-nav-left">
+        <span class="wf-logo">drafted</span>
+        <nav class="wf-tabs"><span>피드</span><span>탐색</span><span>채팅</span></nav>
+      </div>
+      <div class="wf-nav-right"><span class="wf-bell">🔔</span><div class="wf-avatar">U</div></div>
+    </div>
+    <div class="wf-profile">
+      <div class="wf-profile-avatar"></div>
+      <div class="wf-profile-info">
+        <div class="wf-profile-name">design_lee</div>
+        <div class="wf-profile-sub">UX 디자이너 · 현재 ○○에서 5년차</div>
+      </div>
+      <span class="wf-btn">프로필 편집</span>
+    </div>
+    <div class="wf-mypage-tabs">
+      <div class="wf-mypage-tab active">내 이력서 <span class="wf-mypage-tab-count">3</span></div>
+      <div class="wf-mypage-tab">보관함 <span class="wf-mypage-tab-count">12</span></div>
+      <div class="wf-mypage-tab">좋아요 <span class="wf-mypage-tab-count">28</span></div>
+      <div class="wf-mypage-tab">받은 피드백 <span class="wf-mypage-tab-count">5</span></div>
+    </div>
+    <div class="wf-resume-list">
+      <div class="wf-resume-card">
+        <div class="wf-resume-head">
+          <div>
+            <div class="wf-resume-meta-row">
+              <span class="wf-badge-current">현재</span>
+              <span class="wf-resume-period">2024.03 — 현재</span>
+            </div>
+            <div class="wf-resume-title">○○ 스타트업 — 시니어 UX 디자이너</div>
+          </div>
+          <span class="wf-visibility">공개</span>
+        </div>
+        <div class="wf-resume-desc">B2B SaaS 디자인 시스템 v2 리드, 신규 온보딩 플로우 설계로 가입 전환율 30%p 향상…</div>
+        <div class="wf-resume-stats">
+          <span>👁 521</span><span>♡ 87</span><span>🔖 34</span>
+          <span class="wf-edit-link">편집 →</span>
+        </div>
+      </div>
+      <div class="wf-resume-card">
+        <div class="wf-resume-head">
+          <div>
+            <div class="wf-resume-meta-row"><span class="wf-resume-period">2021.06 — 2024.02</span></div>
+            <div class="wf-resume-title">○○ 에이전시 — UX 디자이너</div>
+          </div>
+          <span class="wf-visibility">공개</span>
+        </div>
+        <div class="wf-resume-desc">클라이언트 프로젝트 12건 리딩, 사용자 리서치 방법론 사내 표준화 주도…</div>
+        <div class="wf-resume-stats">
+          <span>👁 312</span><span>♡ 42</span><span>🔖 18</span>
+          <span class="wf-edit-link">편집 →</span>
+        </div>
+      </div>
+      <div class="wf-resume-card">
+        <div class="wf-resume-head">
+          <div>
+            <div class="wf-resume-meta-row"><span class="wf-resume-period">2020.01 — 2021.05</span></div>
+            <div class="wf-resume-title">○○ 스튜디오 — 주니어 디자이너 (인턴)</div>
+          </div>
+          <span class="wf-visibility wf-visibility-private">비공개</span>
+        </div>
+        <div class="wf-resume-desc">첫 직장에서의 6개월 인턴 경험, 디자인 워크플로우 학습…</div>
+        <div class="wf-resume-stats">
+          <span style="color: var(--ink-faint);">비공개 (본인만 열람)</span>
+          <span class="wf-edit-link">편집 →</span>
+        </div>
+      </div>
+      <div class="wf-add-section">+ 새 이력서 만들기</div>
+    </div>
+  </div>
+  <div class="wf-caption">현재 직장 카드에만 "현재" 뱃지. 시간 역순 정렬. 각 카드 단위로 공개·비공개 토글 가능 — 시니어 경력은 공개로, 초기 인턴은 비공개로 같은 선택권.</div>
+
+  <!-- ============ CHATS LIST WIREFRAME ============ -->
+  <h3>⑦ 채팅 목록 — <code>/chats</code></h3>
+  <p>각 대화가 어떤 이력서를 두고 시작된 건지 미리보기 위에 박아둠. 며칠 뒤에 다시 들어와도 맥락 즉시 파악.</p>
+  <p class="wf-meta">/chats</p>
+  <div class="wireframe">
+    <div class="wf-urlbar">
+      <div class="wf-dots"><span class="wf-dot"></span><span class="wf-dot"></span><span class="wf-dot"></span></div>
+      <div class="wf-url">drafted.app/chats</div>
+    </div>
+    <div class="wf-nav">
+      <div class="wf-nav-left">
+        <span class="wf-logo">drafted</span>
+        <nav class="wf-tabs"><span>피드</span><span>탐색</span><span class="wf-tab-active">채팅</span></nav>
+      </div>
+      <div class="wf-nav-right"><span class="wf-bell">🔔</span><div class="wf-avatar">U</div></div>
+    </div>
+    <div class="wf-chats-header">
+      <div class="wf-chats-title">채팅</div>
+      <div class="wf-chats-search"><span>🔍</span><span>대화 검색</span></div>
+    </div>
+    <div class="wf-chats-list">
+      <div class="wf-chats-item">
+        <div class="wf-chats-avatar"></div>
+        <div class="wf-chats-body">
+          <div class="wf-chats-row">
+            <div class="wf-chats-name">design_lee</div>
+            <div class="wf-chats-time unread">2분 전</div>
+          </div>
+          <div class="wf-chats-context">📄 시니어로 점프하기 위한 5년의 정리</div>
+          <div class="wf-chats-preview unread">자기소개 부분이 너무 길어요 — 한 두 문장으로…</div>
+        </div>
+        <div class="wf-unread-badge">2</div>
+      </div>
+      <div class="wf-chats-item">
+        <div class="wf-chats-avatar"></div>
+        <div class="wf-chats-body">
+          <div class="wf-chats-row">
+            <div class="wf-chats-name">개발자_김</div>
+            <div class="wf-chats-time">1시간 전</div>
+          </div>
+          <div class="wf-chats-context">📄 React 포트폴리오로 정리한 3년</div>
+          <div class="wf-chats-preview">감사합니다! 말씀 주신 부분 다 반영했어요</div>
+        </div>
+      </div>
+      <div class="wf-chats-item">
+        <div class="wf-chats-avatar"></div>
+        <div class="wf-chats-body">
+          <div class="wf-chats-row">
+            <div class="wf-chats-name">backend_jay</div>
+            <div class="wf-chats-time">어제</div>
+          </div>
+          <div class="wf-chats-context">📄 코딩테스트 통과한 신입 이력서</div>
+          <div class="wf-chats-preview">혹시 코딩테스트 후기 좀 더 자세히 들을 수 있을까요?</div>
+        </div>
+      </div>
+      <div class="wf-chats-item">
+        <div class="wf-chats-avatar"></div>
+        <div class="wf-chats-body">
+          <div class="wf-chats-row">
+            <div class="wf-chats-name">pm_park</div>
+            <div class="wf-chats-time">3일 전</div>
+          </div>
+          <div class="wf-chats-context">📄 비전공자 PM 도전기</div>
+          <div class="wf-chats-preview">기획 직무 준비하시는 분이라 들으셔서…</div>
+        </div>
+      </div>
+    </div>
+    <div class="wf-chats-footer">채팅은 이력서 상세 페이지에서 "피드백 요청"으로 시작할 수 있어요</div>
+  </div>
+  <div class="wf-caption">새 메시지 있는 대화는 시간이 색 처리되고 안 읽은 개수 뱃지가 붙음.</div>
+
+  <!-- ============ CHAT ROOM WIREFRAME ============ -->
+  <h3>⑧ 채팅방 — <code>/chats/[id]</code></h3>
+  <p>대화 상단에 어떤 이력서에 대한 대화인지 컨텍스트 바를 박아둠. 이력서 피드백이라는 본질이 사라지지 않게.</p>
+  <p class="wf-meta">/chats/c_2f7a</p>
+  <div class="wireframe">
+    <div class="wf-urlbar">
+      <div class="wf-dots"><span class="wf-dot"></span><span class="wf-dot"></span><span class="wf-dot"></span></div>
+      <div class="wf-url">drafted.app/chats/c_2f7a</div>
+    </div>
+    <div class="wf-chat-grid">
+      <div class="wf-chat-sidebar">
+        <div class="wf-chat-search">
+          <div class="wf-chat-search-title">채팅</div>
+          <div class="wf-search-box">🔍 대화 검색</div>
+        </div>
+        <div class="wf-chat-item active">
+          <div class="wf-chat-item-row">
+            <div class="wf-chat-item-avatar"></div>
+            <div class="wf-chat-item-name">design_lee</div>
+            <div class="wf-chat-item-time">2분</div>
+          </div>
+          <div class="wf-chat-item-preview">자기소개 부분이 너무 길어요…</div>
+        </div>
+        <div class="wf-chat-item">
+          <div class="wf-chat-item-row">
+            <div class="wf-chat-item-avatar"></div>
+            <div class="wf-chat-item-name">개발자_김</div>
+            <div class="wf-chat-item-time">1시간</div>
+          </div>
+          <div class="wf-chat-item-preview">감사합니다! 도움이 됐어요</div>
+        </div>
+        <div class="wf-chat-item">
+          <div class="wf-chat-item-row">
+            <div class="wf-chat-item-avatar"></div>
+            <div class="wf-chat-item-name">backend_jay</div>
+            <div class="wf-chat-item-time">어제</div>
+          </div>
+          <div class="wf-chat-item-preview">혹시 코딩테스트 후기…</div>
+        </div>
+        <div class="wf-chat-item">
+          <div class="wf-chat-item-row">
+            <div class="wf-chat-item-avatar"></div>
+            <div class="wf-chat-item-name">pm_park</div>
+            <div class="wf-chat-item-time">3일</div>
+          </div>
+          <div class="wf-chat-item-preview">기획 직무 준비하시는…</div>
+        </div>
+      </div>
+      <div class="wf-chat-main">
+        <div class="wf-chat-header">
+          <div class="wf-chat-header-avatar"></div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-size:13px; font-weight:500;">design_lee</div>
+            <div style="font-size:11px; color: var(--ink-mute);">UX 디자이너 · 5년차</div>
+          </div>
+          <span style="color: var(--ink-faint);">🚩</span>
+        </div>
+        <div class="wf-chat-context">
+          <span>📄</span>
+          <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">시니어로 점프하기 위한 5년의 정리 — design_lee</span>
+          <span style="color: var(--info-text);">이력서 보기</span>
+        </div>
+        <div class="wf-chat-messages">
+          <div class="wf-msg-date">오늘</div>
+          <div class="wf-msg wf-msg-them">안녕하세요! 이력서 잘 봤어요. 자기소개 부분이 너무 길어요 — 한 두 문장으로 줄이는 게 좋을 것 같습니다.</div>
+          <div class="wf-msg wf-msg-them">그리고 디자인 시스템 v2 부분에 결과 수치(예: 컴포넌트 60개, 사용 페이지 N개)를 넣으면 임팩트가 살아요.</div>
+          <div class="wf-msg wf-msg-me">앗 감사합니다! 자기소개 줄이고 수치 넣어볼게요.</div>
+        </div>
+        <div class="wf-chat-input">
+          <div class="wf-input-box">메시지를 입력하세요…</div>
+          <span style="color: var(--ink-faint); font-size: 16px;">➤</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wf-caption">"이력서 보기" 링크로 상세 페이지에 빠르게 돌아갈 수 있게 함.</div>
+
+  <h3>나머지 화면은 패턴 재사용</h3>
+  <ul>
+    <li><code>/me/saved</code>, <code>/me/liked</code> — 피드와 동일한 카드 그리드, 데이터 소스만 다름</li>
+    <li><code>/me/feedback</code> — 채팅 목록과 동일 패턴</li>
+    <li><code>/explore</code> — 피드 + 필터 사이드바 확장</li>
+    <li><code>/auth/callback</code> — UI 없는 라우트, OAuth 토큰 교환만 처리</li>
+  </ul>
+</section>
+
+<!-- ====================== 6. 데이터 모델 ====================== -->
+<section id="data">
+  <div class="section-number">§ 06</div>
+  <h2 class="section-title">데이터 <em>모델</em></h2>
+
+  <h3>핵심 엔티티</h3>
+  <div class="erd">
+    <div class="entity">
+      <div class="entity-name">USERS</div>
+      <div class="entity-field"><span class="key">PK</span>id (uuid)</div>
+      <div class="entity-field">email</div>
+      <div class="entity-field">nickname</div>
+      <div class="entity-field">avatar_url</div>
+      <div class="entity-field">job_role</div>
+      <div class="entity-field">experience_years</div>
+      <div class="entity-field">created_at</div>
+    </div>
+    <div class="entity">
+      <div class="entity-name">RESUMES</div>
+      <div class="entity-field"><span class="key">PK</span>id (uuid)</div>
+      <div class="entity-field"><span class="key">FK</span>user_id</div>
+      <div class="entity-field">title</div>
+      <div class="entity-field">period_start</div>
+      <div class="entity-field">period_end</div>
+      <div class="entity-field">content (jsonb)</div>
+      <div class="entity-field">is_public</div>
+      <div class="entity-field">view_count</div>
+      <div class="entity-field">like_count</div>
+      <div class="entity-field">save_count</div>
+      <div class="entity-field">updated_at</div>
+    </div>
+    <div class="entity">
+      <div class="entity-name">LIKES</div>
+      <div class="entity-field"><span class="key">FK</span>user_id</div>
+      <div class="entity-field"><span class="key">FK</span>resume_id</div>
+      <div class="entity-field">created_at</div>
+    </div>
+    <div class="entity">
+      <div class="entity-name">BOOKMARKS</div>
+      <div class="entity-field"><span class="key">FK</span>user_id</div>
+      <div class="entity-field"><span class="key">FK</span>resume_id</div>
+      <div class="entity-field">created_at</div>
+    </div>
+    <div class="entity">
+      <div class="entity-name">CHAT_ROOMS</div>
+      <div class="entity-field"><span class="key">PK</span>id (uuid)</div>
+      <div class="entity-field"><span class="key">FK</span>user_a_id</div>
+      <div class="entity-field"><span class="key">FK</span>user_b_id</div>
+      <div class="entity-field"><span class="key">FK</span>about_resume_id</div>
+      <div class="entity-field">last_message_at</div>
+    </div>
+    <div class="entity">
+      <div class="entity-name">MESSAGES</div>
+      <div class="entity-field"><span class="key">PK</span>id (uuid)</div>
+      <div class="entity-field"><span class="key">FK</span>room_id</div>
+      <div class="entity-field"><span class="key">FK</span>sender_id</div>
+      <div class="entity-field">content</div>
+      <div class="entity-field">read_at</div>
+      <div class="entity-field">created_at</div>
+    </div>
+  </div>
+
+  <h3>설계 의사결정</h3>
+  <ul>
+    <li><strong>이력서 본문은 JSONB</strong> — 사람마다 섹션 구조가 다르고 자주 바뀜. 정형 컬럼으로 박으면 마이그레이션 비용이 큼.</li>
+    <li><strong>검색 필요 필드만 정형 컬럼</strong> — <code>job_role</code>, <code>experience_years</code>, <code>period_start/end</code>만 별도 컬럼.</li>
+    <li><strong>카운터는 트리거로 자동 업데이트</strong> — <code>like_count</code>, <code>save_count</code> 등을 매 SELECT마다 집계하면 비용↑.</li>
+    <li><strong>채팅방은 두 사용자 간 1개</strong> — <code>(user_a_id, user_b_id)</code>에 유니크 제약. 정렬 규칙(작은 id가 user_a)으로 중복 생성 방지.</li>
+    <li><strong>채팅방에 about_resume_id</strong> — 피드백이 시작된 이력서를 명시. 채팅 컨텍스트 바에 표시.</li>
+  </ul>
+</section>
+
+<!-- ====================== 7. 기술 스택 ====================== -->
+<section id="stack">
+  <div class="section-number">§ 07</div>
+  <h2 class="section-title">기술 <em>스택</em></h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>영역</th><th>선택</th><th>이유</th></tr></thead>
+      <tbody>
+        <tr><td>Frontend</td><td>Next.js 15 (App Router) + TypeScript</td><td>RSC, Server Actions, SSR/SSG 통합</td></tr>
+        <tr><td>스타일</td><td>Tailwind CSS + shadcn/ui</td><td>빠른 셋업, 커스텀 가능한 컴포넌트</td></tr>
+        <tr><td>Backend</td><td>Supabase (PostgreSQL + Auth + Realtime + Storage)</td><td>1인 MVP에 최적, Edge Functions로 확장</td></tr>
+        <tr><td>DB</td><td>PostgreSQL (Supabase 호스팅)</td><td>JSONB, RLS, 트리거, FTS 모두 지원</td></tr>
+        <tr><td>인증</td><td>Supabase Auth</td><td>이메일·소셜 통합, RLS와 자연스럽게 결합</td></tr>
+        <tr><td>실시간</td><td>Supabase Realtime</td><td>Postgres Changes·Broadcast·Presence</td></tr>
+        <tr><td>에디터</td><td>Tiptap</td><td>구조화 가능, JSONB와 정합성, 슬래시 커맨드 확장</td></tr>
+        <tr><td>배포</td><td>Vercel + Supabase</td><td>한 플랫폼에서 deploy → preview까지</td></tr>
+        <tr><td>모니터링</td><td>Sentry + PostHog 또는 Vercel Analytics</td><td>모두 무료 플랜으로 시작</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <strong>왜 별도 백엔드를 두지 않는가</strong> — Supabase가 Auth, DB, Realtime, Storage, REST API 자동 생성을 모두 제공한다. 1인 MVP에서 별도 백엔드 서버를 운영하면 운영 단위만 2개로 늘고 얻는 게 거의 없다. 무거운 비즈니스 로직이 명확해지면 그때 Edge Functions로 점진적으로 분리.
+  </div>
+</section>
+
+<!-- ====================== 8. 학습 로드맵 ====================== -->
+<section id="learning">
+  <div class="section-number">§ 08</div>
+  <h2 class="section-title">학습 <em>로드맵</em></h2>
+
+  <h3>Tier 1 — 셋업 단계 (1주차)</h3>
+  <ul>
+    <li><strong>Next.js App Router</strong> — 파일 라우팅, Server vs Client Component, Server Actions, Metadata API</li>
+    <li><strong>Tailwind CSS</strong> — cheatsheet 검색하며 만들기 (외울 필요 X)</li>
+    <li><strong>shadcn/ui</strong> — 컴포넌트 설치 방식, 본인 코드베이스로 복사되는 구조</li>
+  </ul>
+
+  <h3>Tier 2 — DB와 인증 (2~3주차)</h3>
+  <ul>
+    <li><strong>PostgreSQL 기초</strong> — SQL 기본, JOIN, JSONB 연산자, 인덱스, 트리거, FTS</li>
+    <li><strong>Supabase Auth</strong> — 세션 쿠키, <code>@supabase/ssr</code> 사용법</li>
+    <li><strong>RLS (Row Level Security)</strong> — DB 레벨 권한 검증, 정책 패턴</li>
+    <li><strong>Supabase Client SDK</strong> — 쿼리 API, 타입 자동 생성</li>
+  </ul>
+
+  <h3>Tier 3 — 기능 단위 학습 (만들면서)</h3>
+  <ul>
+    <li><strong>Supabase Realtime</strong> — 채팅 만들 시점</li>
+    <li><strong>Tiptap</strong> — 에디터 만들 시점, StarterKit + 커스텀 노드</li>
+    <li><strong>React Hook Form + Zod</strong> — 폼 검증</li>
+    <li><strong>TanStack Query</strong> — 필요할 때만 (옵셔널)</li>
+  </ul>
+
+  <h3>Tier 4 — 배포·운영 (런칭 직전)</h3>
+  <ul>
+    <li><strong>Vercel</strong> — GitHub 연결, 환경변수, Preview 배포</li>
+    <li><strong>Supabase 운영</strong> — 마이그레이션, 환경 분리</li>
+    <li><strong>Sentry, PostHog</strong> — 5분 셋업</li>
+    <li><strong>Edge Functions</strong> — 필요 시점에 학습</li>
+  </ul>
+
+  <div class="callout">
+    <strong>학습 안 해도 되는 것들</strong> — Prisma/Drizzle 같은 ORM(supabase-js로 충분), Redux 같은 무거운 상태 관리, tRPC(Server Actions이 비슷한 역할), 초기 테스트 프레임워크 도입.
+  </div>
+</section>
+
+<!-- ====================== 9. 개발 로드맵 ====================== -->
+<section id="dev">
+  <div class="section-number">§ 09</div>
+  <h2 class="section-title">개발 <em>로드맵</em></h2>
+
+  <p class="pullquote">한 기능을 위에서 아래까지 완성하고 다음 기능. 가로로 다 만들고 합치는 게 아니라 세로로 vertical slice.</p>
+
+  <h3>Week 1 — 인증 + 골격</h3>
+  <ul>
+    <li><code>/login</code> Google·GitHub OAuth 작동</li>
+    <li><code>/onboarding</code> 닉네임 설정 흐름</li>
+    <li><code>/me</code> 빈 상태 (로그인 검증)</li>
+    <li>공통 레이아웃 (상단 네비, 사이드 패딩)</li>
+    <li>Vercel 배포 + Preview 작동</li>
+  </ul>
+
+  <h3>Week 2 — 이력서 CRUD</h3>
+  <ul>
+    <li><code>resumes</code> 테이블 + RLS 정책</li>
+    <li><code>/me/resumes/new</code> 생성</li>
+    <li><code>/me/resumes/[id]/edit</code> 편집 (Tiptap StarterKit)</li>
+    <li><code>/me</code> 이력서 카드 리스트</li>
+    <li><code>/resumes/[id]</code> 공개 상세</li>
+  </ul>
+
+  <h3>Week 3 — 피드와 인터랙션</h3>
+  <ul>
+    <li><code>/</code> 메인 피드 (최신순)</li>
+    <li><code>likes</code>, <code>bookmarks</code> 테이블 + Server Action</li>
+    <li>좋아요 / 보관 버튼 (useOptimistic)</li>
+    <li><code>/me/saved</code>, <code>/me/liked</code></li>
+  </ul>
+
+  <h3>Week 4 — 채팅</h3>
+  <ul>
+    <li><code>chat_rooms</code>, <code>messages</code> 테이블 + RLS</li>
+    <li><code>/chats</code> 목록</li>
+    <li><code>/chats/[id]</code> + Realtime 구독</li>
+    <li>이력서 상세 → "피드백 요청" 진입점</li>
+  </ul>
+
+  <h3>Week 5+ — 다듬기</h3>
+  <ul>
+    <li>직무·연차 필터 (<code>/explore</code>)</li>
+    <li>Tiptap 커스텀 섹션 노드, 슬래시 커맨드</li>
+    <li>받은 피드백 페이지 (<code>/me/feedback</code>)</li>
+    <li>베타 테스터 모집 (지인 10~20명, 시드 이력서 50개 확보)</li>
+  </ul>
+
+  <h3>1주차 목표</h3>
+  <div class="callout">
+    이번 주 끝에 다음이 동작하면 성공 — ① localhost + Vercel에 배포된 같은 앱, ② Google·GitHub OAuth 로그인 + 닉네임 온보딩, ③ <code>/me</code>가 비로그인 시 리다이렉트, ④ Supabase에 <code>resumes</code> 테이블 + RLS 적용, ⑤ 새 이력서 작성 → DB 저장 → 목록 표시까지 연결.
+  </div>
+</section>
+
+<!-- ====================== 10. 결정 포인트 ====================== -->
+<section id="risks">
+  <div class="section-number">§ 10</div>
+  <h2 class="section-title">결정 포인트 / <em>리스크</em></h2>
+
+  <h3>10.1 개인정보 보호 (최우선)</h3>
+  <p>이력서는 이름·연락처·학력·경력 등 신원 식별이 가능한 민감정보다. 다음 정책을 처음부터 명확히 잡고 시작한다.</p>
+  <ul>
+    <li>공개 시 이름은 닉네임으로만 표시</li>
+    <li>전화번호·이메일은 절대 노출하지 않음</li>
+    <li>식별정보 교환은 본인 의지로 채팅을 통해서만 가능</li>
+    <li>이력서 단위의 공개·비공개 토글 제공</li>
+  </ul>
+
+  <h3>10.2 탐색 가능성</h3>
+  <p>"어떤 이력서를 볼까"에서 막히면 서비스가 작동하지 않는다. MVP에서는 직무 + 연차 두 필터에 집중하고, 학교·회사·기술스택 필터는 v2로 미룬다.</p>
+
+  <h3>10.3 채팅 스팸·사칭</h3>
+  <p>헤드헌터·기업 사칭 시도가 분명히 발생한다.</p>
+  <ul>
+    <li>v1: 신고 + 차단 기능</li>
+    <li>v2: 직장 인증 (회사 이메일 검증) 도입 검토</li>
+  </ul>
+
+  <h3>10.4 Cold Start 문제</h3>
+  <p>이력서가 없으면 신규 가입자가 떠나고, 가입자가 없으면 이력서가 쌓이지 않는다.</p>
+  <ul>
+    <li>베타: 본인 + 지인 10~20명에게 직접 요청해 시드 이력서 50개 확보</li>
+    <li>합격 후기 + 이력서 묶음 콘텐츠로 SEO 자연 유입 노림</li>
+  </ul>
+
+  <h3>10.5 에디터 락인</h3>
+  <p>Tiptap에 깊게 결합하면 후에 Lexical·Plate 등으로 이동 시 비용이 크다.</p>
+  <ul>
+    <li>이력서 데이터를 "섹션 배열 + 도메인 필드 + 부분 Tiptap JSON"으로 저장 (전부 Tiptap JSON에 박지 말 것)</li>
+    <li>페이지 컴포넌트가 Tiptap API를 직접 호출하지 않게 얇은 래퍼 컴포넌트로 감싸기</li>
+  </ul>
+</section>
+
+<footer>
+  Drafted · 서비스 기획 v1.0 · 작성일 2026.05
+</footer>
+
+</main>
+
+</div>
+</body>
+</html>

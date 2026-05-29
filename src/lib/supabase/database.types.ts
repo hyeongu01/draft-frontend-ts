@@ -14,7 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
-      Profiles: {
+      bookmarks: {
+        Row: {
+          created_at: string
+          resume_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          resume_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          resume_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookmarks_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      likes: {
+        Row: {
+          created_at: string
+          resume_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          resume_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          resume_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "likes_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
         Row: {
           created_at: string
           id: string
@@ -32,6 +84,51 @@ export type Database = {
           id?: string
           nickname?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      resumes: {
+        Row: {
+          content: Json
+          created_at: string
+          description: string
+          experience_years: number
+          id: string
+          is_public: boolean
+          like_count: number
+          save_count: number
+          title: string
+          updated_at: string
+          user_id: string
+          view_count: number
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          description?: string
+          experience_years?: number
+          id?: string
+          is_public?: boolean
+          like_count?: number
+          save_count?: number
+          title: string
+          updated_at?: string
+          user_id: string
+          view_count?: number
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          description?: string
+          experience_years?: number
+          id?: string
+          is_public?: boolean
+          like_count?: number
+          save_count?: number
+          title?: string
+          updated_at?: string
+          user_id?: string
+          view_count?: number
         }
         Relationships: []
       }

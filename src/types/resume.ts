@@ -1,0 +1,77 @@
+// src/types/resume.ts
+// 이력서 content(JSONB) 구조 — "섹션 배열 + 섹션별 Tiptap JSON".
+// 검색용 정형 컬럼(job_role, period 등)은 resumes 테이블 컬럼으로 분리, 본문만 여기서.
+
+export type ResumeSection = {
+  id: string;
+  title: string;
+  body: object; // 섹션별 Tiptap ProseMirror JSON (빈 섹션은 {})
+};
+
+export type ResumeContent = {
+  version: 1;
+  sections: ResumeSection[];
+};
+
+// 연차 표시 — 0년차는 "신입"
+export function formatExperience(years: number): string {
+  return years === 0 ? "신입" : `${years}년차`;
+}
+
+// ProseMirror JSON에서 텍스트 노드만 재귀로 긁어 평문 추출
+function collectText(node: unknown): string {
+  if (!node || typeof node !== "object") return "";
+  const n = node as { text?: string; content?: unknown[] };
+  if (typeof n.text === "string") return n.text;
+  if (Array.isArray(n.content)) return n.content.map(collectText).join(" ");
+  return "";
+}
+
+// 피드 카드용 본문 스니펫 — 내용 있는 첫 섹션의 평문을 잘라서 반환
+export function resumeSnippet(content: unknown, max = 100): string {
+  const { sections } = normalizeContent(content);
+  for (const s of sections) {
+    const text = collectText(s.body).replace(/\s+/g, " ").trim();
+    if (text) return text.length > max ? `${text.slice(0, max)}…` : text;
+  }
+  return "";
+}
+
+// 기획서 ⑤ 와이어프레임의 기본 섹션
+export const DEFAULT_SECTION_TITLES = [
+  "자기소개",
+  "경력",
+  "프로젝트",
+  "학력",
+  "스킬",
+] as const;
+
+// 빈 ProseMirror 본문
+export const EMPTY_BODY: object = {};
+
+// DB의 content(빈 객체·레거시 단일 Tiptap 문서·신규 구조 모두)를 ResumeContent로 정규화.
+// 프리셋 id는 SSR/CSR 동일하도록 고정값 사용(랜덤 id는 hydration 불일치 유발).
+export function normalizeContent(raw: unknown): ResumeContent {
+  if (
+    raw &&
+    typeof raw === "object" &&
+    Array.isArray((raw as ResumeContent).sections)
+  ) {
+    return raw as ResumeContent;
+  }
+
+  // 레거시: content가 단일 Tiptap 문서({ type: 'doc', ... })였던 경우 자기소개에 흡수
+  const legacyBody =
+    raw && typeof raw === "object" && (raw as { type?: string }).type === "doc"
+      ? (raw as object)
+      : undefined;
+
+  return {
+    version: 1,
+    sections: DEFAULT_SECTION_TITLES.map((title, i) => ({
+      id: `sec-${i}`,
+      title,
+      body: i === 0 && legacyBody ? legacyBody : EMPTY_BODY,
+    })),
+  };
+}
