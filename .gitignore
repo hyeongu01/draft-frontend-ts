@@ -40,3 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# supabase (CLI 로컬 상태/캐시 — 커밋 금지)
+supabase/.branches
+supabase/.temp
+supabase/.env
