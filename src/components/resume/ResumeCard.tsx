@@ -34,6 +34,7 @@ export default function ResumeCard({
   return (
     <Link
       href={href}
+      prefetch={false}
       className="block border rounded-lg p-4 hover:bg-gray-50 transition-colors"
     >
       <div className="flex items-center gap-1.5 mb-2 text-xs text-gray-500">
