@@ -1,10 +1,10 @@
 "use client";
 import { type JSX, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { useUserContext } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
-const supabase = createClient();
+const API = process.env.NEXT_PUBLIC_API_URL!;
+
 export default function Page(): JSX.Element {
   const { user, profile, isLoading } = useUserContext();
   const router = useRouter();
@@ -13,26 +13,15 @@ export default function Page(): JSX.Element {
     if (isLoading) return;
     if (profile && user) return router.replace("/");
     if (user) return router.replace("/onboarding");
-  }, [isLoading, profile, user]);
+  }, [isLoading, profile, user, router]);
 
   if (isLoading || user) return <>로딩중</>;
 
+  // OAuth는 fetch가 아니라 페이지 이동. 백엔드가 device_id 쿠키 설정 후 구글로 302.
   const googleLogin = () => {
-    supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+    window.location.href = `${API}/auth/google/login`;
   };
-  const githubLogin = () => {
-    supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-sm space-y-10">
@@ -79,8 +68,9 @@ export default function Page(): JSX.Element {
 
           <button
             type="button"
-            className="flex items-center justify-center gap-3 w-full px-4 py-2.5 rounded-lg bg-gray-900 text-sm font-medium text-white hover:bg-gray-800 transition"
-            onClick={githubLogin}
+            disabled
+            title="준비 중"
+            className="flex items-center justify-center gap-3 w-full px-4 py-2.5 rounded-lg bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed"
           >
             <svg
               className="w-5 h-5"
@@ -90,7 +80,7 @@ export default function Page(): JSX.Element {
             >
               <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
             </svg>
-            GitHub로 계속하기
+            GitHub (준비 중)
           </button>
         </div>
 

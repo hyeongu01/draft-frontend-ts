@@ -1,8 +1,11 @@
-// src/app/(app)/me/resumes/[id]/edit/page.tsx
-import { Suspense } from "react";
-import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+"use client";
+// 이력서 편집 — CSR. 소유자 전용 데이터라 클라이언트에서 인증 fetch.
+import { Suspense, use, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import EditResumeForm from "./EditResumeForm";
+import { getResume } from "@/lib/api/resumes";
+import { useUserContext } from "@/context/AuthContext";
+import type { Resume } from "@/lib/types";
 
 export default function EditResumePage({
   params,
@@ -16,22 +19,37 @@ export default function EditResumePage({
   );
 }
 
-async function EditResumeLoader({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const supabase = await createClient();
+function EditResumeLoader({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const { user, isLoading } = useUserContext();
+  const router = useRouter();
+  const [resume, setResume] = useState<Resume | null>(null);
+  const [notFound, setNotFound] = useState(false);
 
-  // 이력서 조회 + 로그인 확인(로컬 JWT) 병렬
-  const [{ data: resume }, { data: claims }] = await Promise.all([
-    supabase.from("resumes").select("*").eq("id", id).single(),
-    supabase.auth.getClaims(),
-  ]);
-  if (!claims?.claims?.sub) redirect("/login");
+  useEffect(() => {
+    if (isLoading) return;
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
+    let alive = true;
+    getResume(id)
+      .then((data) => alive && setResume(data))
+      .catch(() => alive && setNotFound(true));
+    return () => {
+      alive = false;
+    };
+  }, [id, user, isLoading, router]);
 
-  if (!resume) notFound();
+  if (notFound) {
+    return (
+      <div className="max-w-2xl mx-auto p-6 text-center text-gray-500">
+        <p>이력서를 찾을 수 없어요.</p>
+      </div>
+    );
+  }
+
+  if (!resume) return <EditSkeleton />;
 
   return <EditResumeForm resume={resume} />;
 }

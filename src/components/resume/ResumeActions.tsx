@@ -1,15 +1,13 @@
 // src/components/resume/ResumeActions.tsx
 "use client";
 
-import { useOptimistic, useTransition } from "react";
+import { useEffect, useOptimistic, useState, useTransition } from "react";
 import { Heart, Bookmark } from "lucide-react";
-import { toggleLike } from "@/actions/like";
-import { toggleBookmark } from "@/actions/bookmark";
+import { setLike, setBookmark, getResumeState } from "@/lib/api/resumes";
+import { useUserContext } from "@/context/AuthContext";
 
 type Props = {
   resumeId: string;
-  initialLiked: boolean;
-  initialBookmarked: boolean;
   likeCount: number;
   saveCount: number;
 };
@@ -21,32 +19,57 @@ const toggleReducer = (
 
 export default function ResumeActions({
   resumeId,
-  initialLiked,
-  initialBookmarked,
   likeCount,
   saveCount,
 }: Props) {
-  const [like, setLike] = useOptimistic(
-    { on: initialLiked, count: likeCount },
+  const { user } = useUserContext();
+  const [liked, setLiked] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
+
+  // 인증 사용자라면 내 좋아요·보관 상태를 조회 (비로그인은 false 유지)
+  useEffect(() => {
+    if (!user) return;
+    getResumeState(resumeId)
+      .then((s) => {
+        setLiked(s.liked);
+        setBookmarked(s.bookmarked);
+      })
+      .catch(() => {});
+  }, [user, resumeId]);
+
+  const [like, applyLike] = useOptimistic(
+    { on: liked, count: likeCount },
     toggleReducer,
   );
-  const [bookmark, setBookmark] = useOptimistic(
-    { on: initialBookmarked, count: saveCount },
+  const [bookmark, applyBookmark] = useOptimistic(
+    { on: bookmarked, count: saveCount },
     toggleReducer,
   );
   const [isPending, startTransition] = useTransition();
 
   const onLike = () => {
+    const next = !like.on;
     startTransition(async () => {
-      setLike(!like.on);
-      await toggleLike(resumeId);
+      applyLike(next);
+      try {
+        await setLike(resumeId, next);
+        setLiked(next);
+      } catch {
+        /* 실패 시 다음 렌더에서 서버 상태로 복원 */
+      }
     });
   };
 
   const onBookmark = () => {
+    const next = !bookmark.on;
     startTransition(async () => {
-      setBookmark(!bookmark.on);
-      await toggleBookmark(resumeId);
+      applyBookmark(next);
+      try {
+        await setBookmark(resumeId, next);
+        setBookmarked(next);
+      } catch {
+        /* noop */
+      }
     });
   };
 

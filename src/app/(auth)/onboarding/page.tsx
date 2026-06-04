@@ -1,12 +1,8 @@
 "use client";
 import { useUserContext } from "@/context/AuthContext";
-import { ProfileService } from "@/lib/profile";
-import { createClient } from "@/lib/supabase/client";
+import { updateMe } from "@/lib/api/users";
 import { useRouter } from "next/navigation";
 import { type JSX, useEffect, useState } from "react";
-
-const supabase = createClient();
-const profileService = new ProfileService(supabase);
 
 export default function OnboardingPage(): JSX.Element {
   const [nickname, setNickname] = useState<string>("");
@@ -26,13 +22,13 @@ export default function OnboardingPage(): JSX.Element {
     if (isSubmitting) return;
     setIsSubmitting(true);
     try {
-      await profileService.signup(user, nickname);
+      await updateMe(nickname);
       await refreshProfile();
       setIsSubmitting(false);
       router.replace("/");
     } catch (e) {
       setIsSubmitting(false);
-      router.push("/error?reason=signup_error");
+      router.push("/error?reason=signup_failed");
     }
   };
 

@@ -1,11 +1,30 @@
 "use client";
 
-import { createResume } from "@/actions/resume";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { createResume } from "@/lib/api/resumes";
 
 export default function Page() {
-  const [state, formAction, pending] = useActionState(createResume, null);
+  const router = useRouter();
+  const [title, setTitle] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = title.trim();
+    if (!trimmed) return setError("제목을 입력해주세요");
+    setPending(true);
+    setError(null);
+    try {
+      const { id } = await createResume(trimmed);
+      router.push(`/me/resumes/${id}/edit`);
+    } catch {
+      setPending(false);
+      setError("이력서를 만들지 못했어요. 다시 시도해주세요.");
+    }
+  };
 
   return (
     <div className="max-w-md mx-auto p-6">
@@ -18,7 +37,7 @@ export default function Page() {
         어떤 시기의 이력서인가요? 회사명이나 직무로 짧게 적어주세요.
       </p>
 
-      <form action={formAction} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-4">
         <div>
           <label htmlFor="title" className="block text-sm font-medium mb-1">
             제목
@@ -26,6 +45,8 @@ export default function Page() {
           <input
             id="title"
             name="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             placeholder="예: 스타트업 시니어 디자이너 (2024–현재)"
             required
             autoFocus
@@ -33,9 +54,7 @@ export default function Page() {
           />
         </div>
 
-        {state?.error && (
-          <p className="text-sm text-red-600">{state.error}</p>
-        )}
+        {error && <p className="text-sm text-red-600">{error}</p>}
 
         <button
           type="submit"

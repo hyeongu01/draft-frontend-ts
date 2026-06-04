@@ -3,7 +3,8 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { updateResume, deleteResume } from "@/actions/resume";
+import { useRouter } from "next/navigation";
+import { updateResume, deleteResume } from "@/lib/api/resumes";
 import ResumeSections from "@/components/resume/ResumeSections";
 import {
   normalizeContent,
@@ -22,6 +23,7 @@ type Resume = {
 };
 
 export default function EditResumeForm({ resume }: { resume: Resume }) {
+  const router = useRouter();
   const [title, setTitle] = useState(resume.title);
   const [description, setDescription] = useState(resume.description ?? "");
   const [jobRole, setJobRole] = useState(resume.job_role ?? "");
@@ -60,19 +62,24 @@ export default function EditResumeForm({ resume }: { resume: Resume }) {
     setSections((prev) => prev.filter((s) => s.id !== id));
   };
 
+  const [saveError, setSaveError] = useState<string | null>(null);
+
   const handleSave = () => {
     if (yearsError) return; // 검증 실패 시 저장 차단
     startTransition(async () => {
-      const result = await updateResume(resume.id, {
-        title,
-        description: description.trim(),
-        job_role: jobRole.trim(),
-        is_public: isPublic,
-        content: { version: 1, sections },
-        experience_years: experienceYears,
-      });
-      if (!result?.error) {
+      try {
+        await updateResume(resume.id, {
+          title,
+          description: description.trim(),
+          job_role: jobRole.trim(),
+          is_public: isPublic,
+          content: { version: 1, sections },
+          experience_years: experienceYears,
+        });
+        setSaveError(null);
         setSavedAt(new Date());
+      } catch {
+        setSaveError("저장에 실패했어요. 다시 시도해주세요.");
       }
     });
   };
@@ -80,7 +87,12 @@ export default function EditResumeForm({ resume }: { resume: Resume }) {
   const handleDelete = () => {
     if (!confirm("정말 삭제할까요? 되돌릴 수 없어요.")) return;
     startTransition(async () => {
-      await deleteResume(resume.id);
+      try {
+        await deleteResume(resume.id);
+        router.push("/me");
+      } catch {
+        setSaveError("삭제에 실패했어요. 다시 시도해주세요.");
+      }
     });
   };
 
@@ -92,10 +104,14 @@ export default function EditResumeForm({ resume }: { resume: Resume }) {
           <Link href="/me" className="text-sm text-gray-500 hover:underline">
             ← 내 이력서로
           </Link>
-          {savedAt && (
-            <span className="text-xs text-gray-400">
-              저장됨 · {savedAt.toLocaleTimeString()}
-            </span>
+          {saveError ? (
+            <span className="text-xs text-red-500">{saveError}</span>
+          ) : (
+            savedAt && (
+              <span className="text-xs text-gray-400">
+                저장됨 · {savedAt.toLocaleTimeString()}
+              </span>
+            )
           )}
         </div>
         <div className="flex items-center gap-2">

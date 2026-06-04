@@ -1,9 +1,8 @@
-// src/app/(app)/page.tsx
+// src/app/(app)/page.tsx — 공개 피드 (SSR, 인증 불필요)
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import ResumeCard from "@/components/resume/ResumeCard";
-import FilterChips, { YEAR_FILTERS } from "@/components/resume/FilterChips";
+import FilterChips from "@/components/resume/FilterChips";
+import { getPublicResumes } from "@/lib/api/public";
 
 type SearchParams = Promise<{ years?: string }>;
 
@@ -20,49 +19,14 @@ export default function Home({ searchParams }: { searchParams: SearchParams }) {
 
 async function Feed({ searchParams }: { searchParams: SearchParams }) {
   const { years = "" } = await searchParams;
-  const supabase = await createClient();
 
-  // 로컬 JWT 검증(빠름, 네트워크 X) — 실제 권한은 RLS가 보장
-  const { data: claims } = await supabase.auth.getClaims();
-  const userId = claims?.claims?.sub;
-  if (!userId) redirect("/login");
-
-  // 공개 이력서 + 연차 필터 (RLS가 is_public = true 읽기 허용)
-  let query = supabase
-    .from("resumes")
-    .select(
-      "id, title, description, job_role, user_id, experience_years, like_count, save_count, view_count",
-    )
-    .eq("is_public", true);
-
-  const yearFilter = YEAR_FILTERS.find((y) => y.key === years && y.key !== "");
-  if (yearFilter) {
-    query = query.gte("experience_years", yearFilter.min);
-    if (yearFilter.max !== null) {
-      query = query.lte("experience_years", yearFilter.max);
-    }
-  }
-
-  // 프로필 확인 + 이력서 목록 병렬 조회 (독립적이므로)
-  const [{ data: profile }, { data: resumes }] = await Promise.all([
-    supabase.from("profiles").select("nickname").eq("id", userId).single(),
-    query.order("updated_at", { ascending: false }),
-  ]);
-  if (!profile?.nickname) redirect("/onboarding");
-
-  // 작성자 닉네임을 user_id 묶어서 한 번에 조회
-  const authorIds = [...new Set((resumes ?? []).map((r) => r.user_id))];
-  const { data: authors } = authorIds.length
-    ? await supabase.from("profiles").select("id, nickname").in("id", authorIds)
-    : { data: [] };
-  const nicknameById = new Map(
-    (authors ?? []).map((a) => [a.id, a.nickname]),
-  );
+  // 공개 이력서 — 연차 필터는 백엔드 쿼리로 위임. 작성자 닉네임은 응답에 임베딩.
+  const resumes = await getPublicResumes(years);
 
   return (
     <>
       <FilterChips years={years} />
-      {!resumes?.length ? (
+      {!resumes.length ? (
         <div className="border border-dashed rounded-lg p-12 text-center text-gray-500">
           <p className="mb-2">조건에 맞는 이력서가 없어요</p>
           <p className="text-sm">필터를 바꾸거나 첫 이력서를 공개해보세요</p>
@@ -77,7 +41,7 @@ async function Feed({ searchParams }: { searchParams: SearchParams }) {
               description={r.description}
               jobRole={r.job_role}
               experienceYears={r.experience_years}
-              nickname={nicknameById.get(r.user_id) ?? "익명"}
+              nickname={r.author?.nickname ?? "익명"}
               likeCount={r.like_count}
               saveCount={r.save_count}
               viewCount={r.view_count}

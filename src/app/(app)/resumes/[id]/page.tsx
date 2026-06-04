@@ -1,11 +1,12 @@
-// src/app/(app)/resumes/[id]/page.tsx
+// src/app/(app)/resumes/[id]/page.tsx — 공개 이력서 상세 (SSR, 인증 불필요)
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { getPublicResume } from "@/lib/api/public";
 import { normalizeContent, formatExperience } from "@/types/resume";
 import { sectionBodyToHtml } from "@/lib/resume-html";
 import ResumeActions from "@/components/resume/ResumeActions";
+import OwnerEditLink from "@/components/resume/OwnerEditLink";
 
 export default function ResumeDetailPage({
   params,
@@ -21,55 +22,10 @@ export default function ResumeDetailPage({
   );
 }
 
-async function ResumeDetail({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+async function ResumeDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const supabase = await createClient();
-
-  // 이력서 조회 + 현재 유저(로컬 JWT, 네트워크 X) 병렬
-  const [{ data: resume }, { data: claims }] = await Promise.all([
-    supabase.from("resumes").select("*").eq("id", id).single(),
-    supabase.auth.getClaims(),
-  ]);
-
+  const resume = await getPublicResume(id);
   if (!resume) notFound();
-
-  const userId = claims?.claims?.sub;
-  const isOwner = userId === resume.user_id;
-
-  // 작성자 닉네임 + 좋아요·보관 여부 + 조회수 증가를 한 번에 병렬 처리
-  const [{ data: author }, likeRes, bookmarkRes] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("nickname")
-      .eq("id", resume.user_id)
-      .single(),
-    userId
-      ? supabase
-          .from("likes")
-          .select("user_id")
-          .eq("user_id", userId)
-          .eq("resume_id", resume.id)
-          .maybeSingle()
-      : Promise.resolve({ data: null }),
-    userId
-      ? supabase
-          .from("bookmarks")
-          .select("user_id")
-          .eq("user_id", userId)
-          .eq("resume_id", resume.id)
-          .maybeSingle()
-      : Promise.resolve({ data: null }),
-    // 조회수 증가 — 본인 제외 (RPC가 공개 이력서만 +1)
-    isOwner
-      ? Promise.resolve(null)
-      : supabase.rpc("increment_view_count", { p_resume_id: resume.id }),
-  ]);
-  const liked = !!likeRes.data;
-  const bookmarked = !!bookmarkRes.data;
 
   const { sections } = normalizeContent(resume.content);
   const renderedSections = sections
@@ -82,14 +38,7 @@ async function ResumeDetail({
         <Link href="/" className="text-sm text-gray-500 hover:underline">
           ← 피드로
         </Link>
-        {isOwner && (
-          <Link
-            href={`/me/resumes/${resume.id}/edit`}
-            className="text-sm text-gray-500 hover:underline"
-          >
-            편집 →
-          </Link>
-        )}
+        <OwnerEditLink resumeId={resume.id} ownerId={resume.user_id} />
       </div>
 
       <header className="mb-8 pb-6 border-b">
@@ -99,7 +48,7 @@ async function ResumeDetail({
         )}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 text-sm text-gray-500">
-            <span>{author?.nickname ?? "익명"}</span>
+            <span>{resume.author?.nickname ?? "익명"}</span>
             {resume.job_role && (
               <>
                 <span aria-hidden>·</span>
@@ -111,8 +60,6 @@ async function ResumeDetail({
           </div>
           <ResumeActions
             resumeId={resume.id}
-            initialLiked={liked}
-            initialBookmarked={bookmarked}
             likeCount={resume.like_count}
             saveCount={resume.save_count}
           />

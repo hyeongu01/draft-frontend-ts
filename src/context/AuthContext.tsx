@@ -1,18 +1,26 @@
 "use client";
-import { createContext, useState, useContext, useEffect, useRef } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { type User } from "@supabase/supabase-js";
-import { type Profile } from "@/lib/profile";
+import {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+} from "react";
+import { refresh } from "@/lib/api/client";
+import { getMe, logout as apiLogout } from "@/lib/api/users";
+import { MOCK_AUTH, MOCK_USER } from "@/lib/api/mock";
+import type { User } from "@/lib/types";
 
 interface UserContextType {
-  user: User | null;
-  profile: Profile | null;
+  user: User | null; // 인증된 유저 (토큰 유효 시 존재)
+  profile: User | null; // 닉네임까지 설정된 경우에만 non-null (온보딩 분기용)
   isLoading: boolean;
   refreshProfile: () => Promise<void>;
+  reload: () => Promise<void>; // 콜백/온보딩 후 세션 재동기화
+  logout: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
-const supabase = createClient();
 
 export function UserProvider({
   children,
@@ -21,52 +29,49 @@ export function UserProvider({
 }): React.ReactNode {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [profile, setProfile] = useState<Profile | null>(null);
 
-  const loadProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .maybeSingle();
-    if (error) console.error(error.message);
-    setProfile(data ?? null);
-  };
-
-  const refreshProfile = async () => {
-    if (!user) throw new Error("user_not_found");
+  // refresh 쿠키로 세션 복구 → /users/me 로 유저 로드
+  const load = useCallback(async () => {
     setIsLoading(true);
-    await loadProfile(user.id);
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    // supabase auth 상태 변화 구독
-    const { data: sub } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        const u = session?.user ?? null;
-        setUser(u);
-        if (u) {
-          setTimeout(() => {
-            loadProfile(u.id).finally(() => {
-              setIsLoading((prev) => (prev ? false : prev));
-            });
-          }, 0);
-        } else {
-          setProfile(null);
-          setIsLoading((prev) => (prev ? false : prev));
-        }
-      },
-    );
-    return () => sub.subscription.unsubscribe();
+    const token = await refresh();
+    if (!token) {
+      // 실제 세션이 없을 때, MOCK_AUTH=true면 데모 유저로 화면을 볼 수 있게 한다.
+      // 기본(OFF)에서는 null → 로그인 페이지가 정상 노출/동작.
+      setUser(MOCK_AUTH ? MOCK_USER : null);
+      setIsLoading(false);
+      return;
+    }
+    try {
+      setUser(await getMe());
+    } catch {
+      setUser(MOCK_AUTH ? MOCK_USER : null);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const profile = user && user.nickname ? user : null;
+
   return (
-    <UserContext.Provider value={{ user, profile, isLoading, refreshProfile }}>
+    <UserContext.Provider
+      value={{
+        user,
+        profile,
+        isLoading,
+        refreshProfile: load,
+        reload: load,
+        logout: apiLogout,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
 }
+
 export function useUserContext() {
   const ctx = useContext(UserContext);
   if (!ctx)
