@@ -49,15 +49,15 @@ export const MOCK_USER: User = {
 
 function makeResume(r: Partial<Resume> & Pick<Resume, "id" | "title">): Resume {
   return {
-    user_id: "u-other",
+    userId: "u-other",
     description: null,
-    job_role: null,
+    jobRole: null,
     content: {},
-    is_public: true,
-    view_count: 0,
-    like_count: 0,
-    save_count: 0,
-    experience_years: 0,
+    isPublic: true,
+    viewCount: 0,
+    likeCount: 0,
+    saveCount: 0,
+    experienceYears: 0,
     author: { nickname: "익명" },
     ...r,
   };
@@ -66,14 +66,14 @@ function makeResume(r: Partial<Resume> & Pick<Resume, "id" | "title">): Resume {
 const RESUMES: Resume[] = [
   makeResume({
     id: "mock-1",
-    user_id: "u-jihye",
+    userId: "u-jihye",
     title: "스타트업 3년, 0→1 프로덕트 디자이너",
     description: "디자인 시스템 구축과 사용자 리서치 중심으로 성장한 3년 정리",
-    job_role: "프로덕트 디자이너",
-    experience_years: 3,
-    like_count: 42,
-    save_count: 17,
-    view_count: 318,
+    jobRole: "프로덕트 디자이너",
+    experienceYears: 3,
+    likeCount: 42,
+    saveCount: 17,
+    viewCount: 318,
     author: { nickname: "jihye_kim" },
     content: buildContent([
       {
@@ -102,14 +102,14 @@ const RESUMES: Resume[] = [
   }),
   makeResume({
     id: "mock-2",
-    user_id: "u-min",
+    userId: "u-min",
     title: "백엔드 5년차 — 트래픽 10배 견딘 이야기",
     description: "결제 시스템과 대용량 트래픽 처리 경험 위주",
-    job_role: "백엔드 엔지니어",
-    experience_years: 5,
-    like_count: 88,
-    save_count: 53,
-    view_count: 921,
+    jobRole: "백엔드 엔지니어",
+    experienceYears: 5,
+    likeCount: 88,
+    saveCount: 53,
+    viewCount: 921,
     author: { nickname: "min.dev" },
     content: buildContent([
       {
@@ -132,14 +132,14 @@ const RESUMES: Resume[] = [
   }),
   makeResume({
     id: "mock-3",
-    user_id: "u-soa",
+    userId: "u-soa",
     title: "기획자에서 PM으로 — 2년의 전환기",
     description: "데이터 기반 의사결정을 배우며 PM으로 자리잡은 과정",
-    job_role: "프로덕트 매니저",
-    experience_years: 2,
-    like_count: 23,
-    save_count: 9,
-    view_count: 142,
+    jobRole: "프로덕트 매니저",
+    experienceYears: 2,
+    likeCount: 23,
+    saveCount: 9,
+    viewCount: 142,
     author: { nickname: "soa_pm" },
     content: buildContent([
       {
@@ -160,15 +160,15 @@ const RESUMES: Resume[] = [
   // 내 이력서 (소유자 = me)
   makeResume({
     id: "mock-me-1",
-    user_id: MOCK_ME_ID,
+    userId: MOCK_ME_ID,
     title: "현재 회사 이력 정리 (작성 중)",
     description: "지금 다니는 회사에서의 경험을 정리하는 중",
-    job_role: "프론트엔드 엔지니어",
-    experience_years: 4,
-    is_public: true,
-    like_count: 5,
-    save_count: 2,
-    view_count: 60,
+    jobRole: "프론트엔드 엔지니어",
+    experienceYears: 4,
+    isPublic: true,
+    likeCount: 5,
+    saveCount: 2,
+    viewCount: 60,
     author: { nickname: "나" },
     content: buildContent([
       {
@@ -183,12 +183,12 @@ const RESUMES: Resume[] = [
   }),
   makeResume({
     id: "mock-me-2",
-    user_id: MOCK_ME_ID,
+    userId: MOCK_ME_ID,
     title: "첫 회사 회고 (비공개 초안)",
     description: "신입 시절 기록",
-    job_role: "프론트엔드 엔지니어",
-    experience_years: 1,
-    is_public: false,
+    jobRole: "프론트엔드 엔지니어",
+    experienceYears: 1,
+    isPublic: false,
     author: { nickname: "나" },
     content: buildContent([
       { title: "자기소개", body: doc(p("막 시작한 시절의 기록입니다.")) },
@@ -205,11 +205,11 @@ export function mockPublicResumes(years?: string): Resume[] {
     mid: [3, 5],
     senior: [6, 100],
   };
-  const list = RESUMES.filter((r) => r.is_public);
+  const list = RESUMES.filter((r) => r.isPublic);
   const range = years ? ranges[years] : undefined;
   const filtered = range
     ? list.filter(
-        (r) => r.experience_years >= range[0] && r.experience_years <= range[1],
+        (r) => r.experienceYears >= range[0] && r.experienceYears <= range[1],
       )
     : list;
   return clone(filtered);
@@ -221,16 +221,16 @@ export function mockResume(id: string): Resume {
   // 새로 만든(목업) 이력서 — 빈 편집 화면용 기본값
   return makeResume({
     id,
-    user_id: MOCK_ME_ID,
+    userId: MOCK_ME_ID,
     title: "새 이력서",
-    is_public: false,
+    isPublic: false,
     author: { nickname: "나" },
     content: {},
   });
 }
 
 export const mockMyResumes = (): Resume[] =>
-  clone(RESUMES.filter((r) => r.user_id === MOCK_ME_ID));
+  clone(RESUMES.filter((r) => r.userId === MOCK_ME_ID));
 
 export const mockMyBookmarks = (): Resume[] =>
   clone(RESUMES.filter((r) => r.id === "mock-1" || r.id === "mock-2"));

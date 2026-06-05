@@ -11,25 +11,16 @@ import {
   EMPTY_BODY,
   type ResumeSection,
 } from "@/types/resume";
-
-type Resume = {
-  id: string;
-  title: string;
-  description: string | null;
-  job_role: string | null;
-  is_public: boolean;
-  content: unknown;
-  experience_years: number;
-};
+import type { Resume } from "@/lib/types";
 
 export default function EditResumeForm({ resume }: { resume: Resume }) {
   const router = useRouter();
   const [title, setTitle] = useState(resume.title);
   const [description, setDescription] = useState(resume.description ?? "");
-  const [jobRole, setJobRole] = useState(resume.job_role ?? "");
-  const [isPublic, setIsPublic] = useState(resume.is_public);
+  const [jobRole, setJobRole] = useState(resume.jobRole ?? "");
+  const [isPublic, setIsPublic] = useState(resume.isPublic);
   const [experienceYears, setExperienceYears] = useState(
-    resume.experience_years,
+    resume.experienceYears,
   );
   const yearsError =
     experienceYears < 0 || experienceYears > 100
@@ -71,10 +62,10 @@ export default function EditResumeForm({ resume }: { resume: Resume }) {
         await updateResume(resume.id, {
           title,
           description: description.trim(),
-          job_role: jobRole.trim(),
-          is_public: isPublic,
+          jobRole: jobRole.trim(),
+          isPublic: isPublic,
           content: { version: 1, sections },
-          experience_years: experienceYears,
+          experienceYears: experienceYears,
         });
         setSaveError(null);
         setSavedAt(new Date());

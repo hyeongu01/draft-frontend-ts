@@ -13,10 +13,10 @@ import {
 export type ResumeUpdate = {
   title?: string;
   description?: string;
-  job_role?: string;
-  is_public?: boolean;
+  jobRole?: string;
+  isPublic?: boolean;
   content?: unknown;
-  experience_years?: number;
+  experienceYears?: number;
 };
 
 // 내 데이터
