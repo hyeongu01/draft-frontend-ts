@@ -1,19 +1,20 @@
-// 유저(=프로필) API. 온보딩 닉네임 생성도 PUT /users/me 로 통합.
-import { apiJson, apiFetch } from "./client";
+// 유저(=프로필) API. swagger 계약 → orval 생성 함수를 그대로 사용.
+// 온보딩 닉네임 생성도 PUT /users/me 로 통합.
+import {
+  usersControllerGetMyProfile,
+  usersControllerUpdateMyProfile,
+} from "@/lib/api/generated/users/users";
+import { authControllerLogout } from "@/lib/api/generated/auth/auth";
 import { clearAccessToken } from "@/lib/auth/token";
-import type { User } from "@/lib/types";
 
-export const getMe = () => apiJson<User>("/users/me");
+export const getMe = () => usersControllerGetMyProfile();
 
 export const updateMe = (nickname: string) =>
-  apiJson<User>("/users/me", {
-    method: "PUT",
-    body: JSON.stringify({ nickname }),
-  });
+  usersControllerUpdateMyProfile({ nickname });
 
 export async function logout() {
   try {
-    await apiFetch("/auth/logout", { method: "POST" });
+    await authControllerLogout();
   } catch {
     // 네트워크 실패해도 클라이언트 토큰은 비운다
   }

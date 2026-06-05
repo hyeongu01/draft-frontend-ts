@@ -41,7 +41,10 @@ export const MOCK_ME_ID = "me";
 export const MOCK_USER: User = {
   id: MOCK_ME_ID,
   nickname: "데모유저",
-  avatar_url: null,
+  name: "데모",
+  email: "demo@example.com",
+  createdAt: { ISOFormat: "2026-01-01T00:00:00.000Z", timeAgo: "오래 전" },
+  updatedAt: { ISOFormat: "2026-01-01T00:00:00.000Z", timeAgo: "오래 전" },
 };
 
 function makeResume(r: Partial<Resume> & Pick<Resume, "id" | "title">): Resume {

@@ -1,10 +1,8 @@
 // 백엔드(NestJS) 응답 도메인 타입. Supabase database.types.ts 대체.
+import type { UserResponseType } from "@/lib/api/generated/model";
 
-export type User = {
-  id: string;
-  nickname: string | null;
-  avatar_url?: string | null;
-};
+// 유저 = /users/me 응답. orval 생성 타입을 단일 출처로 사용.
+export type User = UserResponseType;
 
 export type ResumeAuthor = {
   id?: string;

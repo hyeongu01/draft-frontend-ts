@@ -1,0 +1,456 @@
+﻿{
+    "openapi":  "3.0.0",
+    "paths":  {
+                  "/health":  {
+                                  "get":  {
+                                              "operationId":  "AppController_getHello",
+                                              "parameters":  [
+                                                                 {
+                                                                     "name":  "host",
+                                                                     "required":  true,
+                                                                     "in":  "header",
+                                                                     "schema":  {
+                                                                                    "type":  "string"
+                                                                                }
+                                                                 }
+                                                             ],
+                                              "responses":  {
+                                                                "200":  {
+                                                                            "description":  ""
+                                                                        },
+                                                                "500":  {
+                                                                            "description":  "Internal Server Error"
+                                                                        }
+                                                            },
+                                              "tags":  [
+                                                           "App"
+                                                       ]
+                                          }
+                              },
+                  "/users/me":  {
+                                    "get":  {
+                                                "operationId":  "UsersController_getMyProfile",
+                                                "parameters":  [
+
+                                                               ],
+                                                "responses":  {
+                                                                  "200":  {
+                                                                              "description":  "",
+                                                                              "content":  {
+                                                                                              "application/json":  {
+                                                                                                                       "schema":  {
+                                                                                                                                      "allOf":  [
+                                                                                                                                                    {
+                                                                                                                                                        "$ref":  "#/components/schemas/ResponseSuccess"
+                                                                                                                                                    },
+                                                                                                                                                    {
+                                                                                                                                                        "properties":  {
+                                                                                                                                                                           "data":  {
+                                                                                                                                                                                        "$ref":  "#/components/schemas/UserResponseType"
+                                                                                                                                                                                    }
+                                                                                                                                                                       },
+                                                                                                                                                        "required":  [
+                                                                                                                                                                         "data"
+                                                                                                                                                                     ]
+                                                                                                                                                    }
+                                                                                                                                                ]
+                                                                                                                                  }
+                                                                                                                   }
+                                                                                          }
+                                                                          },
+                                                                  "500":  {
+                                                                              "description":  "Internal Server Error"
+                                                                          }
+                                                              },
+                                                "security":  [
+                                                                 {
+                                                                     "bearer":  [
+
+                                                                                ]
+                                                                 }
+                                                             ],
+                                                "tags":  [
+                                                             "Users"
+                                                         ]
+                                            },
+                                    "put":  {
+                                                "operationId":  "UsersController_updateMyProfile",
+                                                "parameters":  [
+
+                                                               ],
+                                                "requestBody":  {
+                                                                    "required":  true,
+                                                                    "content":  {
+                                                                                    "application/json":  {
+                                                                                                             "schema":  {
+                                                                                                                            "$ref":  "#/components/schemas/UpdateUserDto"
+                                                                                                                        }
+                                                                                                         }
+                                                                                }
+                                                                },
+                                                "responses":  {
+                                                                  "200":  {
+                                                                              "description":  "",
+                                                                              "content":  {
+                                                                                              "application/json":  {
+                                                                                                                       "schema":  {
+                                                                                                                                      "allOf":  [
+                                                                                                                                                    {
+                                                                                                                                                        "$ref":  "#/components/schemas/ResponseSuccess"
+                                                                                                                                                    },
+                                                                                                                                                    {
+                                                                                                                                                        "properties":  {
+                                                                                                                                                                           "data":  {
+                                                                                                                                                                                        "type":  "object",
+                                                                                                                                                                                        "additionalProperties":  false,
+                                                                                                                                                                                        "example":  {
+
+                                                                                                                                                                                                    }
+                                                                                                                                                                                    }
+                                                                                                                                                                       },
+                                                                                                                                                        "required":  [
+                                                                                                                                                                         "data"
+                                                                                                                                                                     ]
+                                                                                                                                                    }
+                                                                                                                                                ]
+                                                                                                                                  }
+                                                                                                                   }
+                                                                                          }
+                                                                          },
+                                                                  "500":  {
+                                                                              "description":  "Internal Server Error"
+                                                                          }
+                                                              },
+                                                "security":  [
+                                                                 {
+                                                                     "bearer":  [
+
+                                                                                ]
+                                                                 }
+                                                             ],
+                                                "tags":  [
+                                                             "Users"
+                                                         ]
+                                            },
+                                    "delete":  {
+                                                   "operationId":  "UsersController_deleteMyProfile",
+                                                   "parameters":  [
+
+                                                                  ],
+                                                   "responses":  {
+                                                                     "200":  {
+                                                                                 "description":  "",
+                                                                                 "content":  {
+                                                                                                 "application/json":  {
+                                                                                                                          "schema":  {
+                                                                                                                                         "allOf":  [
+                                                                                                                                                       {
+                                                                                                                                                           "$ref":  "#/components/schemas/ResponseSuccess"
+                                                                                                                                                       },
+                                                                                                                                                       {
+                                                                                                                                                           "properties":  {
+                                                                                                                                                                              "data":  {
+                                                                                                                                                                                           "type":  "object",
+                                                                                                                                                                                           "additionalProperties":  false,
+                                                                                                                                                                                           "example":  {
+
+                                                                                                                                                                                                       }
+                                                                                                                                                                                       }
+                                                                                                                                                                          },
+                                                                                                                                                           "required":  [
+                                                                                                                                                                            "data"
+                                                                                                                                                                        ]
+                                                                                                                                                       }
+                                                                                                                                                   ]
+                                                                                                                                     }
+                                                                                                                      }
+                                                                                             }
+                                                                             },
+                                                                     "500":  {
+                                                                                 "description":  "Internal Server Error"
+                                                                             }
+                                                                 },
+                                                   "security":  [
+                                                                    {
+                                                                        "bearer":  [
+
+                                                                                   ]
+                                                                    }
+                                                                ],
+                                                   "tags":  [
+                                                                "Users"
+                                                            ]
+                                               }
+                                },
+                  "/auth/google/login":  {
+                                             "get":  {
+                                                         "description":  "device_id HttpOnly 쿠키를 설정하고 구글 OAuth 동의 화면으로 302 리다이렉트 합니다.",
+                                                         "operationId":  "AuthController_googleLogin",
+                                                         "parameters":  [
+
+                                                                        ],
+                                                         "responses":  {
+                                                                           "302":  {
+                                                                                       "description":  "구글 OAuth 인증 페이지로 리다이렉트",
+                                                                                       "headers":  {
+                                                                                                       "Location":  {
+                                                                                                                        "description":  "리다이렉트 될 구글 인증 URL",
+                                                                                                                        "schema":  {
+                                                                                                                                       "type":  "string",
+                                                                                                                                       "example":  "\u0027https://accounts.google.com/o/oauth2/v2/auth?..."
+                                                                                                                                   }
+                                                                                                                    }
+                                                                                                   }
+                                                                                   },
+                                                                           "500":  {
+                                                                                       "description":  "Internal Server Error"
+                                                                                   }
+                                                                       },
+                                                         "summary":  "구글 로그인",
+                                                         "tags":  [
+                                                                      "Auth"
+                                                                  ]
+                                                     }
+                                         },
+                  "/auth/google/callback":  {
+                                                "post":  {
+                                                             "description":  "google oAuth 는 client 의 callback 으로 리다이렉트 되고, 온보딩에서 입력한 닉네임과 인가 코드를 바디로 받아 로그인을 마친다. refreshToken 은 쿠키로, accessToken 은 바디로 반환합니다.",
+                                                             "operationId":  "AuthController_googleOAuthCallback",
+                                                             "parameters":  [
+
+                                                                            ],
+                                                             "requestBody":  {
+                                                                                 "required":  true,
+                                                                                 "content":  {
+                                                                                                 "application/json":  {
+                                                                                                                          "schema":  {
+                                                                                                                                         "$ref":  "#/components/schemas/GoogleCallbackDto"
+                                                                                                                                     }
+                                                                                                                      }
+                                                                                             }
+                                                                             },
+                                                             "responses":  {
+                                                                               "200":  {
+                                                                                           "description":  "",
+                                                                                           "content":  {
+                                                                                                           "application/json":  {
+                                                                                                                                    "schema":  {
+                                                                                                                                                   "allOf":  [
+                                                                                                                                                                 {
+                                                                                                                                                                     "$ref":  "#/components/schemas/ResponseSuccess"
+                                                                                                                                                                 },
+                                                                                                                                                                 {
+                                                                                                                                                                     "properties":  {
+                                                                                                                                                                                        "data":  {
+                                                                                                                                                                                                     "$ref":  "#/components/schemas/AccessTokenResponseType"
+                                                                                                                                                                                                 }
+                                                                                                                                                                                    },
+                                                                                                                                                                     "required":  [
+                                                                                                                                                                                      "data"
+                                                                                                                                                                                  ]
+                                                                                                                                                                 }
+                                                                                                                                                             ]
+                                                                                                                                               }
+                                                                                                                                }
+                                                                                                       }
+                                                                                       },
+                                                                               "500":  {
+                                                                                           "description":  "Internal Server Error"
+                                                                                       }
+                                                                           },
+                                                             "summary":  "구글 로그인 콜백",
+                                                             "tags":  [
+                                                                          "Auth"
+                                                                      ]
+                                                         }
+                                            },
+                  "/auth/refresh":  {
+                                        "post":  {
+                                                     "description":  "refresh_token HttpOnly 쿠키로 재발급. 새 refreshToken 은 쿠키로 회전되고, 바디엔 accessToken 만 반환합니다.",
+                                                     "operationId":  "AuthController_refresh",
+                                                     "parameters":  [
+
+                                                                    ],
+                                                     "responses":  {
+                                                                       "200":  {
+                                                                                   "description":  "Success",
+                                                                                   "content":  {
+                                                                                                   "application/json":  {
+                                                                                                                            "schema":  {
+                                                                                                                                           "allOf":  [
+                                                                                                                                                         {
+                                                                                                                                                             "$ref":  "#/components/schemas/ResponseSuccess"
+                                                                                                                                                         },
+                                                                                                                                                         {
+                                                                                                                                                             "properties":  {
+                                                                                                                                                                                "data":  {
+                                                                                                                                                                                             "$ref":  "#/components/schemas/AccessTokenResponseType"
+                                                                                                                                                                                         }
+                                                                                                                                                                            }
+                                                                                                                                                         }
+                                                                                                                                                     ]
+                                                                                                                                       }
+                                                                                                                        }
+                                                                                               }
+                                                                               },
+                                                                       "500":  {
+                                                                                   "description":  "Internal Server Error"
+                                                                               }
+                                                                   },
+                                                     "summary":  "access token 재발급",
+                                                     "tags":  [
+                                                                  "Auth"
+                                                              ]
+                                                 }
+                                    },
+                  "/auth/logout":  {
+                                       "post":  {
+                                                    "operationId":  "AuthController_logout",
+                                                    "parameters":  [
+
+                                                                   ],
+                                                    "responses":  {
+                                                                      "200":  {
+                                                                                  "description":  ""
+                                                                              },
+                                                                      "500":  {
+                                                                                  "description":  "Internal Server Error"
+                                                                              }
+                                                                  },
+                                                    "tags":  [
+                                                                 "Auth"
+                                                             ]
+                                                }
+                                   }
+              },
+    "info":  {
+                 "title":  "Draft Backend TS",
+                 "description":  "Draft Backend TS",
+                 "version":  "1.0",
+                 "contact":  {
+
+                             }
+             },
+    "tags":  [
+
+             ],
+    "servers":  [
+                    {
+                        "url":  "http://localhost:4000",
+                        "description":  "local"
+                    }
+                ],
+    "components":  {
+                       "securitySchemes":  {
+                                               "bearer":  {
+                                                              "scheme":  "bearer",
+                                                              "bearerFormat":  "JWT",
+                                                              "type":  "http"
+                                                          }
+                                           },
+                       "schemas":  {
+                                       "ResponseSuccess":  {
+                                                               "type":  "object",
+                                                               "properties":  {
+                                                                                  "statusCode":  {
+                                                                                                     "type":  "number",
+                                                                                                     "example":  200
+                                                                                                 },
+                                                                                  "timestamp":  {
+                                                                                                    "type":  "string",
+                                                                                                    "example":  "2026-06-04T02:09:04.385Z"
+                                                                                                }
+                                                                              },
+                                                               "required":  [
+                                                                                "statusCode",
+                                                                                "timestamp"
+                                                                            ]
+                                                           },
+                                       "DateFormatObject":  {
+                                                                "type":  "object",
+                                                                "properties":  {
+                                                                                   "ISOFormat":  {
+                                                                                                     "type":  "string"
+                                                                                                 },
+                                                                                   "timeAgo":  {
+                                                                                                   "type":  "string"
+                                                                                               }
+                                                                               },
+                                                                "required":  [
+                                                                                 "ISOFormat",
+                                                                                 "timeAgo"
+                                                                             ]
+                                                            },
+                                       "UserResponseType":  {
+                                                                "type":  "object",
+                                                                "properties":  {
+                                                                                   "id":  {
+                                                                                              "type":  "string"
+                                                                                          },
+                                                                                   "nickname":  {
+                                                                                                    "type":  "string",
+                                                                                                    "nullable":  true
+                                                                                                },
+                                                                                   "name":  {
+                                                                                                "type":  "string"
+                                                                                            },
+                                                                                   "email":  {
+                                                                                                 "type":  "string"
+                                                                                             },
+                                                                                   "createdAt":  {
+                                                                                                     "$ref":  "#/components/schemas/DateFormatObject"
+                                                                                                 },
+                                                                                   "updatedAt":  {
+                                                                                                     "$ref":  "#/components/schemas/DateFormatObject"
+                                                                                                 }
+                                                                               },
+                                                                "required":  [
+                                                                                 "id",
+                                                                                 "nickname",
+                                                                                 "name",
+                                                                                 "email",
+                                                                                 "createdAt",
+                                                                                 "updatedAt"
+                                                                             ]
+                                                            },
+                                       "UpdateUserDto":  {
+                                                             "type":  "object",
+                                                             "properties":  {
+                                                                                "nickname":  {
+                                                                                                 "type":  "string"
+                                                                                             }
+                                                                            },
+                                                             "required":  [
+                                                                              "nickname"
+                                                                          ]
+                                                         },
+                                       "AccessTokenResponseType":  {
+                                                                       "type":  "object",
+                                                                       "properties":  {
+                                                                                          "accessToken":  {
+                                                                                                              "type":  "string"
+                                                                                                          },
+                                                                                          "user":  {
+                                                                                                       "$ref":  "#/components/schemas/UserResponseType"
+                                                                                                   }
+                                                                                      },
+                                                                       "required":  [
+                                                                                        "accessToken",
+                                                                                        "user"
+                                                                                    ]
+                                                                   },
+                                       "GoogleCallbackDto":  {
+                                                                 "type":  "object",
+                                                                 "properties":  {
+                                                                                    "code":  {
+                                                                                                 "type":  "string",
+                                                                                                 "description":  "구글 OAuth 인가 코드"
+                                                                                             }
+                                                                                },
+                                                                 "required":  [
+                                                                                  "code"
+                                                                              ]
+                                                             }
+                                   }
+                   }
+}
