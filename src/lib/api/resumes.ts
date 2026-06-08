@@ -42,13 +42,8 @@ export const getResumeState = (id: string) =>
     : apiJson<{ liked: boolean; bookmarked: boolean }>(`/resumes/${id}/me`);
 
 // 뮤테이션
-export const createResume = (title: string) =>
-  USE_MOCK
-    ? Promise.resolve({ id: `mock-new-${title.length}` })
-    : apiJson<{ id: string }>("/resumes", {
-        method: "POST",
-        body: JSON.stringify({ title }),
-      });
+// 이력서 생성은 swagger 반영됨 → 생성 훅(useResumesControllerCreateItem) 직접 사용.
+// (src/app/(app)/me/resumes/new/page.tsx)
 
 export const updateResume = (id: string, updates: ResumeUpdate) =>
   USE_MOCK

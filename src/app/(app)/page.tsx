@@ -43,7 +43,7 @@ async function Feed({ searchParams }: { searchParams: SearchParams }) {
               experienceYears={r.experienceYears}
               nickname={r.author?.nickname ?? "익명"}
               likeCount={r.likeCount}
-              saveCount={r.saveCount}
+              scrapCount={r.scrapCount}
               viewCount={r.viewCount}
             />
           ))}

@@ -56,7 +56,7 @@ function makeResume(r: Partial<Resume> & Pick<Resume, "id" | "title">): Resume {
     isPublic: true,
     viewCount: 0,
     likeCount: 0,
-    saveCount: 0,
+    scrapCount: 0,
     experienceYears: 0,
     author: { nickname: "익명" },
     ...r,
@@ -72,7 +72,7 @@ const RESUMES: Resume[] = [
     jobRole: "프로덕트 디자이너",
     experienceYears: 3,
     likeCount: 42,
-    saveCount: 17,
+    scrapCount: 17,
     viewCount: 318,
     author: { nickname: "jihye_kim" },
     content: buildContent([
@@ -108,7 +108,7 @@ const RESUMES: Resume[] = [
     jobRole: "백엔드 엔지니어",
     experienceYears: 5,
     likeCount: 88,
-    saveCount: 53,
+    scrapCount: 53,
     viewCount: 921,
     author: { nickname: "min.dev" },
     content: buildContent([
@@ -138,7 +138,7 @@ const RESUMES: Resume[] = [
     jobRole: "프로덕트 매니저",
     experienceYears: 2,
     likeCount: 23,
-    saveCount: 9,
+    scrapCount: 9,
     viewCount: 142,
     author: { nickname: "soa_pm" },
     content: buildContent([
@@ -167,7 +167,7 @@ const RESUMES: Resume[] = [
     experienceYears: 4,
     isPublic: true,
     likeCount: 5,
-    saveCount: 2,
+    scrapCount: 2,
     viewCount: 60,
     author: { nickname: "나" },
     content: buildContent([

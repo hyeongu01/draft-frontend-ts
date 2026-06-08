@@ -7,9 +7,15 @@
  */
 
 export * from './accessTokenResponseType';
+export * from './authControllerLogout200';
+export * from './createResumeDto';
+export * from './createResumeDtoContent';
 export * from './dateFormatObject';
 export * from './googleCallbackDto';
 export * from './responseSuccess';
+export * from './resumeResponseType';
+export * from './resumeResponseTypeCategory';
+export * from './resumeResponseTypeContent';
 export * from './updateUserDto';
 export * from './userResponseType';
 export * from './usersControllerDeleteMyProfile200';

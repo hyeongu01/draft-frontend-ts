@@ -30,6 +30,13 @@ export const DEFAULT_SECTION_TITLES = [
 // 빈 ProseMirror 본문
 export const EMPTY_BODY: object = {};
 
+// 빈 Tiptap 에디터의 저장 형식 (StarterKit 빈 문서 = editor.getJSON()).
+// 이력서 최초 생성 시 content 기본값으로 사용.
+export const EMPTY_DOC = {
+  type: "doc",
+  content: [{ type: "paragraph" }],
+} as const;
+
 // DB의 content(빈 객체·레거시 단일 Tiptap 문서·신규 구조 모두)를 ResumeContent로 정규화.
 // 프리셋 id는 SSR/CSR 동일하도록 고정값 사용(랜덤 id는 hydration 불일치 유발).
 export function normalizeContent(raw: unknown): ResumeContent {

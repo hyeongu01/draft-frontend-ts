@@ -61,7 +61,7 @@ async function ResumeDetail({ params }: { params: Promise<{ id: string }> }) {
           <ResumeActions
             resumeId={resume.id}
             likeCount={resume.likeCount}
-            saveCount={resume.saveCount}
+            scrapCount={resume.scrapCount}
           />
         </div>
       </header>

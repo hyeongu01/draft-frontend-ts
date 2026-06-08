@@ -26,6 +26,7 @@ import type {
 
 import type {
   AccessTokenResponseType,
+  AuthControllerLogout200,
   GoogleCallbackDto
 } from '../model';
 
@@ -129,7 +130,7 @@ export function useAuthControllerGoogleLogin<TData = Awaited<ReturnType<typeof a
 
 
 /**
- * google oAuth 는 client 의 callback 으로 리다이렉트 되고, 온보딩에서 입력한 닉네임과 인가 코드를 바디로 받아 로그인을 마친다. refreshToken 은 쿠키로, accessToken 은 바디로 반환합니다.
+ * google oAuth 는 client 의 callback 으로 리다이렉트 되고, 온보딩에서 입력한 닉네임과 인가 코드를 바디로 받아 로그인을 마친다. refreshToken 은 쿠키로, accessToken, user 은 바디로 반환합니다.
  * @summary 구글 로그인 콜백
  */
 export const authControllerGoogleOAuthCallback = (
@@ -193,7 +194,7 @@ export const useAuthControllerGoogleOAuthCallback = <TError = ErrorType<void>,
       return useMutation(getAuthControllerGoogleOAuthCallbackMutationOptions(options), queryClient);
     }
     /**
- * refresh_token HttpOnly 쿠키로 재발급. 새 refreshToken 은 쿠키로 회전되고, 바디엔 accessToken 만 반환합니다.
+ * refresh_token HttpOnly 쿠키로 재발급. 새 refreshToken 은 쿠키로 회전되고, 바디엔 accessToken, user 가 반환합니다.
  * @summary access token 재발급
  */
 export const authControllerRefresh = (
@@ -254,13 +255,17 @@ export const useAuthControllerRefresh = <TError = ErrorType<void>,
       > => {
       return useMutation(getAuthControllerRefreshMutationOptions(options), queryClient);
     }
-    export const authControllerLogout = (
+    /**
+ * 세션 쿠키에서 deviceId (key: device_id) 을 읽을 수 있는 경우 해당 디바이스 로그아웃. 그렇지 않은 경우 모든 디바이스에서 로그아웃
+ * @summary logout - 디바이스 로그아웃 / 유저 전체 로그아웃
+ */
+export const authControllerLogout = (
 
  signal?: AbortSignal
 ) => {
 
 
-      return customFetch<void>(
+      return customFetch<AuthControllerLogout200>(
       {url: `/auth/logout`, method: 'POST', signal
     },
       );
@@ -299,7 +304,10 @@ const {mutation: mutationOptions} = options ?
 
     export type AuthControllerLogoutMutationError = ErrorType<void>
 
-    export const useAuthControllerLogout = <TError = ErrorType<void>,
+    /**
+ * @summary logout - 디바이스 로그아웃 / 유저 전체 로그아웃
+ */
+export const useAuthControllerLogout = <TError = ErrorType<void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerLogout>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof authControllerLogout>>,

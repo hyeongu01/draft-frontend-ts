@@ -19,7 +19,7 @@ export type Resume = {
   isPublic: boolean;
   viewCount: number;
   likeCount: number;
-  saveCount: number;
+  scrapCount: number;
   experienceYears: number;
   createdAt?: string;
   updatedAt?: string;

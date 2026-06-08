@@ -1,6 +1,7 @@
 ---
 name: sync-swagger
 description: 백엔드 NestJS의 OpenAPI 문서를 호출해 api/swagger.json으로 동기화한다. 사용자가 "swagger 동기화", "스웨거 갱신", "API 문서 업데이트", "sync swagger" 등을 요청하거나, 프론트 작업 전 계약을 최신화해야 할 때 사용.
+allowed-tools: PowerShell(pnpm gen:api) Bash(git diff:*) Bash(git show:*) Bash(git status:*)
 ---
 
 # sync-swagger

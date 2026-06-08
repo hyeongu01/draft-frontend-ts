@@ -214,7 +214,7 @@
                                          },
                   "/auth/google/callback":  {
                                                 "post":  {
-                                                             "description":  "google oAuth 는 client 의 callback 으로 리다이렉트 되고, 온보딩에서 입력한 닉네임과 인가 코드를 바디로 받아 로그인을 마친다. refreshToken 은 쿠키로, accessToken 은 바디로 반환합니다.",
+                                                             "description":  "google oAuth 는 client 의 callback 으로 리다이렉트 되고, 온보딩에서 입력한 닉네임과 인가 코드를 바디로 받아 로그인을 마친다. refreshToken 은 쿠키로, accessToken, user 은 바디로 반환합니다.",
                                                              "operationId":  "AuthController_googleOAuthCallback",
                                                              "parameters":  [
 
@@ -266,14 +266,14 @@
                                             },
                   "/auth/refresh":  {
                                         "post":  {
-                                                     "description":  "refresh_token HttpOnly 쿠키로 재발급. 새 refreshToken 은 쿠키로 회전되고, 바디엔 accessToken 만 반환합니다.",
+                                                     "description":  "refresh_token HttpOnly 쿠키로 재발급. 새 refreshToken 은 쿠키로 회전되고, 바디엔 accessToken, user 가 반환합니다.",
                                                      "operationId":  "AuthController_refresh",
                                                      "parameters":  [
 
                                                                     ],
                                                      "responses":  {
                                                                        "200":  {
-                                                                                   "description":  "Success",
+                                                                                   "description":  "",
                                                                                    "content":  {
                                                                                                    "application/json":  {
                                                                                                                             "schema":  {
@@ -286,7 +286,10 @@
                                                                                                                                                                                 "data":  {
                                                                                                                                                                                              "$ref":  "#/components/schemas/AccessTokenResponseType"
                                                                                                                                                                                          }
-                                                                                                                                                                            }
+                                                                                                                                                                            },
+                                                                                                                                                             "required":  [
+                                                                                                                                                                              "data"
+                                                                                                                                                                          ]
                                                                                                                                                          }
                                                                                                                                                      ]
                                                                                                                                        }
@@ -305,23 +308,106 @@
                                     },
                   "/auth/logout":  {
                                        "post":  {
+                                                    "description":  "세션 쿠키에서 deviceId (key: device_id) 을 읽을 수 있는 경우 해당 디바이스 로그아웃. 그렇지 않은 경우 모든 디바이스에서 로그아웃",
                                                     "operationId":  "AuthController_logout",
                                                     "parameters":  [
 
                                                                    ],
                                                     "responses":  {
                                                                       "200":  {
-                                                                                  "description":  ""
+                                                                                  "description":  "",
+                                                                                  "content":  {
+                                                                                                  "application/json":  {
+                                                                                                                           "schema":  {
+                                                                                                                                          "allOf":  [
+                                                                                                                                                        {
+                                                                                                                                                            "$ref":  "#/components/schemas/ResponseSuccess"
+                                                                                                                                                        },
+                                                                                                                                                        {
+                                                                                                                                                            "properties":  {
+                                                                                                                                                                               "data":  {
+                                                                                                                                                                                            "type":  "object",
+                                                                                                                                                                                            "additionalProperties":  false,
+                                                                                                                                                                                            "example":  {
+
+                                                                                                                                                                                                        }
+                                                                                                                                                                                        }
+                                                                                                                                                                           },
+                                                                                                                                                            "required":  [
+                                                                                                                                                                             "data"
+                                                                                                                                                                         ]
+                                                                                                                                                        }
+                                                                                                                                                    ]
+                                                                                                                                      }
+                                                                                                                       }
+                                                                                              }
                                                                               },
                                                                       "500":  {
                                                                                   "description":  "Internal Server Error"
                                                                               }
                                                                   },
+                                                    "summary":  "logout - 디바이스 로그아웃 / 유저 전체 로그아웃",
                                                     "tags":  [
                                                                  "Auth"
                                                              ]
                                                 }
-                                   }
+                                   },
+                  "/resumes":  {
+                                   "post":  {
+                                                "description":  "로그인한 유저가 새 이력서(resume)를 생성합니다. 작성자(userId)는 인증 토큰에서 자동 지정되며, 생성된 이력서는 비공개(isPublic=false) 상태로 시작합니다. careerYears 와 category(categoryId)는 선택 항목으로, 비워두고 생성한 뒤 수정 API 로 채울 수 있습니다. 생성된 이력서를 연결된 category 정보와 함께 반환합니다.",
+                                                "operationId":  "ResumesController_createItem",
+                                                "parameters":  [
+
+                                                               ],
+                                                "requestBody":  {
+                                                                    "required":  true,
+                                                                    "content":  {
+                                                                                    "application/json":  {
+                                                                                                             "schema":  {
+                                                                                                                            "$ref":  "#/components/schemas/CreateResumeDto"
+                                                                                                                        }
+                                                                                                         }
+                                                                                }
+                                                                },
+                                                "responses":  {
+                                                                  "200":  {
+                                                                              "description":  "",
+                                                                              "content":  {
+                                                                                              "application/json":  {
+                                                                                                                       "schema":  {
+                                                                                                                                      "allOf":  [
+                                                                                                                                                    {
+                                                                                                                                                        "$ref":  "#/components/schemas/ResponseSuccess"
+                                                                                                                                                    },
+                                                                                                                                                    {
+                                                                                                                                                        "properties":  {
+                                                                                                                                                                           "data":  {
+                                                                                                                                                                                        "$ref":  "#/components/schemas/ResumeResponseType"
+                                                                                                                                                                                    }
+                                                                                                                                                                       },
+                                                                                                                                                        "required":  [
+                                                                                                                                                                         "data"
+                                                                                                                                                                     ]
+                                                                                                                                                    }
+                                                                                                                                                ]
+                                                                                                                                  }
+                                                                                                                   }
+                                                                                          }
+                                                                          }
+                                                              },
+                                                "security":  [
+                                                                 {
+                                                                     "bearer":  [
+
+                                                                                ]
+                                                                 }
+                                                             ],
+                                                "summary":  "resume 생성",
+                                                "tags":  [
+                                                             "Resumes"
+                                                         ]
+                                            }
+                               }
               },
     "info":  {
                  "title":  "Draft Backend TS",
@@ -450,7 +536,84 @@
                                                                  "required":  [
                                                                                   "code"
                                                                               ]
-                                                             }
+                                                             },
+                                       "ResumeResponseType":  {
+                                                                  "type":  "object",
+                                                                  "properties":  {
+                                                                                     "id":  {
+                                                                                                "type":  "string"
+                                                                                            },
+                                                                                     "title":  {
+                                                                                                   "type":  "string"
+                                                                                               },
+                                                                                     "description":  {
+                                                                                                         "type":  "string"
+                                                                                                     },
+                                                                                     "content":  {
+                                                                                                     "type":  "object",
+                                                                                                     "additionalProperties":  true
+                                                                                                 },
+                                                                                     "likeCount":  {
+                                                                                                       "type":  "number"
+                                                                                                   },
+                                                                                     "scrapCount":  {
+                                                                                                        "type":  "number"
+                                                                                                    },
+                                                                                     "careerYears":  {
+                                                                                                         "type":  "number"
+                                                                                                     },
+                                                                                     "isPublic":  {
+                                                                                                      "type":  "boolean"
+                                                                                                  },
+                                                                                     "userId":  {
+                                                                                                    "type":  "string"
+                                                                                                },
+                                                                                     "category":  {
+                                                                                                      "type":  "object"
+                                                                                                  },
+                                                                                     "createdAt":  {
+                                                                                                       "$ref":  "#/components/schemas/DateFormatObject"
+                                                                                                   },
+                                                                                     "updatedAt":  {
+                                                                                                       "$ref":  "#/components/schemas/DateFormatObject"
+                                                                                                   }
+                                                                                 },
+                                                                  "required":  [
+                                                                                   "id",
+                                                                                   "title",
+                                                                                   "description",
+                                                                                   "content",
+                                                                                   "likeCount",
+                                                                                   "scrapCount",
+                                                                                   "isPublic",
+                                                                                   "userId",
+                                                                                   "createdAt",
+                                                                                   "updatedAt"
+                                                                               ]
+                                                              },
+                                       "CreateResumeDto":  {
+                                                               "type":  "object",
+                                                               "properties":  {
+                                                                                  "title":  {
+                                                                                                "type":  "string"
+                                                                                            },
+                                                                                  "description":  {
+                                                                                                      "type":  "string"
+                                                                                                  },
+                                                                                  "content":  {
+                                                                                                  "type":  "object",
+                                                                                                  "additionalProperties":  true
+                                                                                              },
+                                                                                  "careerYears":  {
+                                                                                                      "type":  "number"
+                                                                                                  }
+                                                                              },
+                                                               "required":  [
+                                                                                "title",
+                                                                                "description",
+                                                                                "content"
+                                                                            ]
+                                                           }
                                    }
                    }
 }

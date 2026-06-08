@@ -162,7 +162,7 @@ function TabContent({
           experienceYears={r.experienceYears}
           nickname={ownTab ? fallbackNickname : r.author?.nickname ?? "익명"}
           likeCount={r.likeCount}
-          saveCount={r.saveCount}
+          scrapCount={r.scrapCount}
           viewCount={r.viewCount}
           isPublic={ownTab ? r.isPublic : undefined}
         />

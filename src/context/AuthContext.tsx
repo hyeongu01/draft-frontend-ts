@@ -45,17 +45,20 @@ export function UserProvider({
     }
   }, []);
 
-  // 앱 부팅 시 세션 복구: refresh 쿠키 → accessToken(메모리) → 프로필.
+  // 앱 부팅 시 세션 복구: refresh 쿠키 → accessToken(메모리) + user.
+  // refresh 응답이 user를 포함하므로 별도 GET /users/me 왕복은 생략한다.
   // refresh는 "메모리 토큰이 비어있는 시점"에만 필요하므로 여기서만 호출한다.
   const load = useCallback(async () => {
     setIsLoading(true);
-    const token = await refresh();
-    if (!token) {
+    const session = await refresh();
+    if (!session) {
       setUser(MOCK_AUTH ? MOCK_USER : null);
       setIsLoading(false);
       return;
     }
-    await hydrate();
+    // 계약상 user는 항상 동봉되지만, 누락 시엔 /users/me로 폴백.
+    if (session.user) setUser(session.user);
+    else await hydrate();
     setIsLoading(false);
   }, [hydrate]);
 
