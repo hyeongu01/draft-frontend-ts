@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -nA3 \"export function useResumesControllerFindOne\" src/lib/api/generated/resumes-private/resumes-private.ts)"
+    ]
+  }
+}

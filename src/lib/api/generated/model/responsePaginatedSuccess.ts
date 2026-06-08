@@ -8,7 +8,7 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface ResponseSuccess {
+export interface ResponsePaginatedSuccess {
   statusCode: number;
   timestamp: string;
 }

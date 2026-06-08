@@ -3,19 +3,35 @@
  * Do not edit manually.
  * Draft Backend TS
  * Draft Backend TS
+ *
+ * ※ category 는 일반 유저가 생성/수정/삭제할 수 없으며 조회만 가능합니다. category 관리(생성·수정·삭제)는 추후 AdminJS 기반 관리자 도구를 통해 제공될 예정입니다.
  * OpenAPI spec version: 1.0
  */
 
 export * from './accessTokenResponseType';
 export * from './authControllerLogout200';
+export * from './categoriesControllerGetAllCategories200';
+export * from './categoriesControllerGetAllCategoriesOrder';
+export * from './categoriesControllerGetAllCategoriesParams';
+export * from './categoryResponseType';
 export * from './createResumeDto';
 export * from './createResumeDtoContent';
 export * from './dateFormatObject';
 export * from './googleCallbackDto';
+export * from './groupResponseType';
+export * from './paginationMetadataType';
+export * from './paginationMetadataTypeOrder';
+export * from './responsePaginatedSuccess';
 export * from './responseSuccess';
 export * from './resumeResponseType';
-export * from './resumeResponseTypeCategory';
 export * from './resumeResponseTypeContent';
+export * from './resumesControllerDeleteItem200';
+export * from './resumesControllerFindAll200';
+export * from './resumesControllerFindAllOrder';
+export * from './resumesControllerFindAllParams';
+export * from './resumesControllerUpdateItem200';
+export * from './updateResumeDto';
+export * from './updateResumeDtoContent';
 export * from './updateUserDto';
 export * from './userResponseType';
 export * from './usersControllerDeleteMyProfile200';

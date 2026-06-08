@@ -11,7 +11,7 @@ type Props = {
   nickname: string;
   likeCount: number;
   scrapCount: number;
-  viewCount: number;
+  viewCount?: number; // 백엔드 계약에 아직 없음 — 있을 때만 표시
   // 제공 시 공개/비공개 배지 표시 (마이페이지 전용)
   isPublic?: boolean;
 };
@@ -68,7 +68,7 @@ export default function ResumeCard({
       <div className="flex gap-3 text-xs text-gray-400">
         <span>♥ {likeCount}</span>
         <span>🔖 {scrapCount}</span>
-        <span>👁 {viewCount}</span>
+        {viewCount !== undefined && <span>👁 {viewCount}</span>}
       </div>
     </Link>
   );

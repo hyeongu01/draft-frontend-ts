@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useResumesControllerCreateItem } from "@/lib/api/generated/resumes/resumes";
+import { useResumesControllerCreateItem } from "@/lib/api/generated/resumes-private/resumes-private";
 import { EMPTY_DOC } from "@/types/resume";
 
 export default function Page() {

@@ -8,7 +8,10 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface ResponseSuccess {
-  statusCode: number;
-  timestamp: string;
-}
+export type PaginationMetadataTypeOrder = typeof PaginationMetadataTypeOrder[keyof typeof PaginationMetadataTypeOrder];
+
+
+export const PaginationMetadataTypeOrder = {
+  asc: 'asc',
+  desc: 'desc',
+} as const;

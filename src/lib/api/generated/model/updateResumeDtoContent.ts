@@ -8,7 +8,4 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface ResponseSuccess {
-  statusCode: number;
-  timestamp: string;
-}
+export type UpdateResumeDtoContent = { [key: string]: unknown };

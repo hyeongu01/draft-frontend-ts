@@ -5,10 +5,15 @@
 //
 // 변환 전: { allOf: [ {$ref: ResponseSuccess}, { properties: { data: <X> } } ] }
 // 변환 후: <X>
-const ENVELOPE_NAME = "ResponseSuccess";
+// 봉투 base는 둘 다 { statusCode, timestamp, (data) } 형태:
+//  - ResponseSuccess: 일반 응답
+//  - ResponsePaginatedSuccess: 페이지네이션 응답(data 안에 items/metadata)
+const ENVELOPE_NAMES = ["ResponseSuccess", "ResponsePaginatedSuccess"];
 
 const isEnvelopeRef = (s) =>
-  s && typeof s.$ref === "string" && s.$ref.endsWith(`/${ENVELOPE_NAME}`);
+  s &&
+  typeof s.$ref === "string" &&
+  ENVELOPE_NAMES.some((name) => s.$ref.endsWith(`/${name}`));
 
 function unwrap(schema) {
   if (!schema || !Array.isArray(schema.allOf)) return schema;

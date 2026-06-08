@@ -8,7 +8,10 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface ResponseSuccess {
-  statusCode: number;
-  timestamp: string;
-}
+export type ResumesControllerFindAllOrder = typeof ResumesControllerFindAllOrder[keyof typeof ResumesControllerFindAllOrder];
+
+
+export const ResumesControllerFindAllOrder = {
+  asc: 'asc',
+  desc: 'desc',
+} as const;
