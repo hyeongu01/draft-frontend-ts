@@ -38,7 +38,7 @@ async function ResumeDetail({ params }: { params: Promise<{ id: string }> }) {
         <Link href="/" className="text-sm text-gray-500 hover:underline">
           ← 피드로
         </Link>
-        <OwnerEditLink resumeId={resume.id} ownerId={resume.user_id} />
+        <OwnerEditLink resumeId={resume.id} ownerId={resume.userId} />
       </div>
 
       <header className="mb-8 pb-6 border-b">
@@ -49,19 +49,19 @@ async function ResumeDetail({ params }: { params: Promise<{ id: string }> }) {
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 text-sm text-gray-500">
             <span>{resume.author?.nickname ?? "익명"}</span>
-            {resume.job_role && (
+            {resume.jobRole && (
               <>
                 <span aria-hidden>·</span>
-                <span>{resume.job_role}</span>
+                <span>{resume.jobRole}</span>
               </>
             )}
             <span aria-hidden>·</span>
-            <span>{formatExperience(resume.experience_years)}</span>
+            <span>{formatExperience(resume.experienceYears)}</span>
           </div>
           <ResumeActions
             resumeId={resume.id}
-            likeCount={resume.like_count}
-            saveCount={resume.save_count}
+            likeCount={resume.likeCount}
+            scrapCount={resume.scrapCount}
           />
         </div>
       </header>

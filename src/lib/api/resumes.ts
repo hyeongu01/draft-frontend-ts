@@ -10,15 +10,6 @@ import {
   mockResume,
 } from "./mock";
 
-export type ResumeUpdate = {
-  title?: string;
-  description?: string;
-  job_role?: string;
-  is_public?: boolean;
-  content?: unknown;
-  experience_years?: number;
-};
-
 // 내 데이터
 export const getMyResumes = () =>
   USE_MOCK
@@ -42,26 +33,10 @@ export const getResumeState = (id: string) =>
     : apiJson<{ liked: boolean; bookmarked: boolean }>(`/resumes/${id}/me`);
 
 // 뮤테이션
-export const createResume = (title: string) =>
-  USE_MOCK
-    ? Promise.resolve({ id: `mock-new-${title.length}` })
-    : apiJson<{ id: string }>("/resumes", {
-        method: "POST",
-        body: JSON.stringify({ title }),
-      });
-
-export const updateResume = (id: string, updates: ResumeUpdate) =>
-  USE_MOCK
-    ? Promise.resolve({ ...mockResume(id), ...updates } as Resume)
-    : apiJson<Resume>(`/resumes/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify(updates),
-      });
-
-export const deleteResume = (id: string) =>
-  USE_MOCK
-    ? Promise.resolve(null)
-    : apiJson<unknown>(`/resumes/${id}`, { method: "DELETE" });
+// 이력서 생성/수정/삭제는 swagger 반영됨 → 생성 훅 직접 사용:
+//   생성: useResumesControllerCreateItem (me/resumes/new)
+//   수정: useResumesControllerUpdateItem (PATCH), 삭제: useResumesControllerDeleteItem (DELETE)
+//   (me/resumes/[id]/edit/EditResumeForm.tsx)
 
 // 좋아요·보관 토글 (on=true→추가, false→삭제)
 export const setLike = (id: string, on: boolean) =>

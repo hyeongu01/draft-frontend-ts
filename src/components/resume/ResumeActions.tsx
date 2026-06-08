@@ -9,7 +9,7 @@ import { useUserContext } from "@/context/AuthContext";
 type Props = {
   resumeId: string;
   likeCount: number;
-  saveCount: number;
+  scrapCount: number;
 };
 
 const toggleReducer = (
@@ -20,11 +20,14 @@ const toggleReducer = (
 export default function ResumeActions({
   resumeId,
   likeCount,
-  saveCount,
+  scrapCount,
 }: Props) {
   const { user } = useUserContext();
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
+  // 카운트도 상태로 관리 — 성공 시 함께 갱신해야 낙관적 +1/-1이 트랜지션 후에도 유지된다.
+  const [likeC, setLikeC] = useState(likeCount);
+  const [scrapC, setScrapC] = useState(scrapCount);
 
   // 인증 사용자라면 내 좋아요·보관 상태를 조회 (비로그인은 false 유지)
   useEffect(() => {
@@ -38,11 +41,11 @@ export default function ResumeActions({
   }, [user, resumeId]);
 
   const [like, applyLike] = useOptimistic(
-    { on: liked, count: likeCount },
+    { on: liked, count: likeC },
     toggleReducer,
   );
   const [bookmark, applyBookmark] = useOptimistic(
-    { on: bookmarked, count: saveCount },
+    { on: bookmarked, count: scrapC },
     toggleReducer,
   );
   const [isPending, startTransition] = useTransition();
@@ -54,6 +57,7 @@ export default function ResumeActions({
       try {
         await setLike(resumeId, next);
         setLiked(next);
+        setLikeC((c) => c + (next ? 1 : -1));
       } catch {
         /* 실패 시 다음 렌더에서 서버 상태로 복원 */
       }
@@ -67,6 +71,7 @@ export default function ResumeActions({
       try {
         await setBookmark(resumeId, next);
         setBookmarked(next);
+        setScrapC((c) => c + (next ? 1 : -1));
       } catch {
         /* noop */
       }

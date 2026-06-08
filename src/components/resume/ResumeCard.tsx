@@ -10,8 +10,8 @@ type Props = {
   experienceYears: number;
   nickname: string;
   likeCount: number;
-  saveCount: number;
-  viewCount: number;
+  scrapCount: number;
+  viewCount?: number; // 백엔드 계약에 아직 없음 — 있을 때만 표시
   // 제공 시 공개/비공개 배지 표시 (마이페이지 전용)
   isPublic?: boolean;
 };
@@ -24,7 +24,7 @@ export default function ResumeCard({
   experienceYears,
   nickname,
   likeCount,
-  saveCount,
+  scrapCount,
   viewCount,
   isPublic,
 }: Props) {
@@ -67,8 +67,8 @@ export default function ResumeCard({
       )}
       <div className="flex gap-3 text-xs text-gray-400">
         <span>♥ {likeCount}</span>
-        <span>🔖 {saveCount}</span>
-        <span>👁 {viewCount}</span>
+        <span>🔖 {scrapCount}</span>
+        {viewCount !== undefined && <span>👁 {viewCount}</span>}
       </div>
     </Link>
   );

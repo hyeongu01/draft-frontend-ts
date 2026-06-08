@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Drafted 프론트엔드 개발 워크플로 가이드</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --panel-2: #1e222b;
+    --border: #2a2f3a;
+    --text: #e6e9ef;
+    --muted: #9aa3b2;
+    --accent: #6ea8fe;
+    --accent-2: #7ee787;
+    --warn: #f0b429;
+    --danger: #ff6b6b;
+    --code-bg: #0b0d11;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+      "Malgun Gothic", "Pretendard", Roboto, sans-serif;
+    line-height: 1.7;
+    font-size: 15.5px;
+  }
+  .wrap { display: grid; grid-template-columns: 240px 1fr; max-width: 1180px; margin: 0 auto; }
+  nav {
+    position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+    padding: 28px 18px; border-right: 1px solid var(--border); font-size: 13.5px;
+  }
+  nav .brand { font-weight: 800; font-size: 16px; letter-spacing: -0.3px; margin-bottom: 6px; }
+  nav .brand span { color: var(--accent); }
+  nav .sub { color: var(--muted); font-size: 12px; margin-bottom: 20px; }
+  nav a { display: block; color: var(--muted); text-decoration: none; padding: 5px 10px; border-radius: 7px; }
+  nav a:hover { color: var(--text); background: var(--panel-2); }
+  nav .grp { color: #6b7280; text-transform: uppercase; font-size: 10.5px; letter-spacing: 1px; margin: 18px 0 6px; padding-left: 10px; }
+  main { padding: 44px 48px 120px; min-width: 0; }
+  h1 { font-size: 30px; letter-spacing: -0.8px; margin: 0 0 8px; }
+  h2 { font-size: 21px; margin: 48px 0 14px; padding-top: 10px; letter-spacing: -0.4px; border-top: 1px solid var(--border); }
+  h2:first-of-type { border-top: none; }
+  h3 { font-size: 16.5px; margin: 26px 0 10px; color: #cdd5e1; }
+  p { margin: 10px 0; color: #d2d8e2; }
+  .lead { color: var(--muted); font-size: 16px; max-width: 760px; }
+  code { font-family: "JetBrains Mono", "SF Mono", "Cascadia Code", Consolas, monospace; font-size: 13px; }
+  p code, li code, td code { background: var(--panel-2); border: 1px solid var(--border); padding: 1px 6px; border-radius: 6px; color: #ffd9a8; }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px 18px; overflow-x: auto; margin: 14px 0; font-size: 13px; line-height: 1.6;
+  }
+  pre code { color: #d7dee8; }
+  .tok-c { color: #6b7689; font-style: italic; }   /* comment */
+  .tok-k { color: #ff7b9c; }                         /* keyword */
+  .tok-s { color: #a5e075; }                         /* string */
+  .tok-f { color: #6ea8fe; }                         /* function */
+  .tok-t { color: #7ee7c7; }                         /* type */
+  .tok-p { color: #c8a2ff; }                         /* punctuation/path */
+  ul, ol { padding-left: 22px; }
+  li { margin: 5px 0; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; margin: 16px 0; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+  .pill.you { background: rgba(126,231,135,.14); color: var(--accent-2); border: 1px solid rgba(126,231,135,.3); }
+  .pill.agent { background: rgba(110,168,254,.14); color: var(--accent); border: 1px solid rgba(110,168,254,.3); }
+  .pill.auto { background: rgba(200,162,255,.14); color: #c8a2ff; border: 1px solid rgba(200,162,255,.3); }
+  .note { border-left: 3px solid var(--accent); background: rgba(110,168,254,.07); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+  .warn { border-left: 3px solid var(--warn); background: rgba(240,180,41,.07); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+  .danger { border-left: 3px solid var(--danger); background: rgba(255,107,107,.07); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+  .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0; margin: 22px 0; }
+  .flow .step { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; flex: 1; min-width: 150px; }
+  .flow .step .n { font-size: 11px; color: var(--muted); font-weight: 700; }
+  .flow .step .t { font-weight: 700; margin: 4px 0 2px; font-size: 14.5px; }
+  .flow .step .d { font-size: 12.5px; color: var(--muted); }
+  .flow .arrow { display: flex; align-items: center; color: var(--muted); padding: 0 10px; font-size: 20px; }
+  .kbd { background: var(--panel-2); border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 6px; padding: 2px 7px; font-size: 12.5px; font-family: monospace; }
+  .muted { color: var(--muted); }
+  .filepath { color: #ffd9a8; font-family: monospace; font-size: 12.5px; }
+  footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; }
+  @media (max-width: 860px) {
+    .wrap { grid-template-columns: 1fr; }
+    nav { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+    main { padding: 28px 20px 80px; }
+    .grid2, .grid3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Drafted<span>·</span>FE</div>
+    <div class="sub">프론트엔드 개발 워크플로 가이드</div>
+    <div class="grp">시작</div>
+    <a href="#overview">1. 한눈에 보기</a>
+    <a href="#pieces">2. 구성요소</a>
+    <div class="grp">사용법</div>
+    <a href="#daily">3. 일상 워크플로</a>
+    <a href="#commands">4. 명령어 레퍼런스</a>
+    <a href="#agent">5. 에이전트 사용법</a>
+    <a href="#hooks">6. 생성 훅 사용</a>
+    <a href="#contract">7. 계약 변경 흐름</a>
+    <div class="grp">운영</div>
+    <a href="#rules">8. 규칙·금지</a>
+    <a href="#trouble">9. 트러블슈팅</a>
+  </nav>
+
+  <main>
+    <h1>Drafted 프론트엔드 개발 워크플로</h1>
+    <p class="lead">
+      백엔드(NestJS)는 직접 개발하고, 프론트엔드는 <b>시니어 프론트 에이전트</b>가 만든다.
+      둘의 계약은 오직 <code>api/swagger.json</code> 하나로 맞추고, 그 파일에서
+      <b>타입과 TanStack Query 훅을 orval이 자동 생성</b>한다. 이 문서는 그 흐름을 어떻게 굴리는지 설명한다.
+    </p>
+
+    <div class="note">
+      <b>핵심 한 줄:</b> 백엔드에서 <code>/docs</code> → <code>api/swagger.json</code>(동기화) →
+      <code>pnpm gen:api</code>(코드 생성) → 화면에서 <code>use…</code> 훅 사용. swagger가 바뀔 때마다 이 사이클을 반복.
+    </div>
+
+    <!-- ===================== 1 ===================== -->
+    <h2 id="overview">1. 한눈에 보기</h2>
+    <div class="flow">
+      <div class="step"><div class="n">STEP 1 · <span class="pill you">YOU</span></div><div class="t">백엔드 개발</div><div class="d">NestJS에서 엔드포인트 + Swagger 데코레이터 작성, <code>localhost:4000</code> 실행</div></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="n">STEP 2 · <span class="pill auto">SKILL</span></div><div class="t">swagger 동기화</div><div class="d"><code>/sync-swagger</code> → <span class="filepath">api/swagger.json</span> 갱신</div></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="n">STEP 3 · <span class="pill auto">ORVAL</span></div><div class="t">코드 생성</div><div class="d"><code>pnpm gen:api</code> → <span class="filepath">src/lib/api/generated/</span> 타입+훅</div></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="n">STEP 4 · <span class="pill agent">AGENT</span></div><div class="t">화면 구현</div><div class="d">생성 훅으로 컴포넌트 작성, lint·tsc 검증</div></div>
+    </div>
+    <p>
+      이 사이클에서 <b>사람이 직접 타입이나 fetch 코드를 손으로 쓰지 않는다.</b> swagger가 단일 진실 출처이고,
+      코드는 그로부터 파생된다. 계약에 부족함이 보이면 코드로 우회하지 않고 <a href="#contract">백엔드에 변경을 요청</a>한다.
+    </p>
+
+    <!-- ===================== 2 ===================== -->
+    <h2 id="pieces">2. 구성요소</h2>
+    <table>
+      <thead><tr><th>구성요소</th><th>위치</th><th>역할</th></tr></thead>
+      <tbody>
+        <tr><td><b>senior-frontend</b> 에이전트</td><td class="filepath">.claude/agents/senior-frontend.md</td><td>프론트 구현 담당. swagger 기반으로 화면·연동을 만들고, 계약 개선을 요청한다.</td></tr>
+        <tr><td><b>sync-swagger</b> 스킬</td><td class="filepath">.claude/skills/sync-swagger/</td><td><code>localhost:4000/docs</code> → <code>api/swagger.json</code> 동기화 + 재생성.</td></tr>
+        <tr><td><b>swagger.json</b></td><td class="filepath">api/swagger.json</td><td>★ 단일 진실 출처. 백엔드 OpenAPI 문서.</td></tr>
+        <tr><td><b>orval 설정</b></td><td class="filepath">orval.config.ts</td><td>swagger → 타입 + TanStack Query 훅 생성 규칙.</td></tr>
+        <tr><td><b>커스텀 mutator</b></td><td class="filepath">src/lib/api/orval-fetcher.ts</td><td>생성 훅이 기존 <code>apiJson</code>을 타게 연결(인증·봉투 처리 재사용).</td></tr>
+        <tr><td><b>생성물</b></td><td class="filepath">src/lib/api/generated/</td><td>자동 생성된 타입·훅. <b>수동 편집 금지.</b></td></tr>
+        <tr><td><b>QueryProvider</b></td><td class="filepath">src/components/providers/QueryProvider.tsx</td><td>TanStack Query Provider. root layout에 래핑됨.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>왜 커스텀 mutator인가?</h3>
+    <p>
+      이 프로젝트의 인증은 까다롭다 — accessToken은 메모리, refreshToken은 HttpOnly 쿠키, 401이면 자동 refresh 후 재시도,
+      응답은 <code>{ statusCode, timestamp, data }</code> 봉투. 이 로직은 이미 <code>apiJson</code>에 있다.
+      orval 생성 훅이 자체 fetch를 쓰면 이 처리를 우회하므로, <b>생성 훅 → customFetch → apiJson</b>으로 연결해
+      모든 호출이 동일한 인증·봉투 처리를 타게 했다. 그래서 <b>생성 훅의 <code>data</code>는 봉투를 벗긴 실제 payload</b>다.
+    </p>
+
+    <!-- ===================== 3 ===================== -->
+    <h2 id="daily">3. 일상 워크플로</h2>
+
+    <h3>A. 백엔드 계약이 새로 생기거나 바뀐 경우</h3>
+    <ol>
+      <li>백엔드(NestJS)를 <code>localhost:4000</code>으로 실행한다.</li>
+      <li>채팅에 <span class="kbd">/sync-swagger</span> 입력 → <code>api/swagger.json</code>이 최신 <code>/docs</code> 응답으로 갱신되고, 이어서 <code>pnpm gen:api</code>로 훅이 재생성된다.</li>
+      <li>에이전트가 <b>변경된 엔드포인트·타입의 diff</b>와 <b>영향받는 화면</b>을 요약 보고한다.</li>
+      <li>필요하면 화면 코드를 새 훅에 맞춰 정합한다.</li>
+    </ol>
+
+    <h3>B. 화면/기능을 새로 구현하는 경우</h3>
+    <ol>
+      <li>에이전트에게 작업을 맡긴다 (예: <span class="muted">"내 이력서 목록 화면 만들어줘"</span>).</li>
+      <li>에이전트가 <code>api/swagger.json</code>에서 해당 계약을 확인한다.</li>
+      <li>계약이 있으면 → 생성 훅으로 구현. 없으면 → <a href="#contract">계약을 요청</a>하거나 <code>USE_MOCK</code>으로 임시 진행.</li>
+      <li>구현 후 <code>pnpm lint</code> + <code>npx tsc --noEmit</code>로 검증.</li>
+    </ol>
+
+    <div class="warn">
+      <b>순서 주의:</b> swagger를 바꾸면 <b>반드시</b> <code>pnpm gen:api</code>로 재생성해야 코드에 반영된다.
+      <code>/sync-swagger</code> 스킬은 이 둘을 묶어서 수행한다.
+    </div>
+
+    <!-- ===================== 4 ===================== -->
+    <h2 id="commands">4. 명령어 레퍼런스</h2>
+    <table>
+      <thead><tr><th>명령</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td><code>pnpm gen:api</code></td><td>swagger.json → 타입·훅 재생성 (<code>orval --config orval.config.ts</code>)</td></tr>
+        <tr><td><code>/sync-swagger</code></td><td>백엔드 <code>/docs</code> 호출 → swagger.json 갱신 → 재생성 → diff 보고 (스킬)</td></tr>
+        <tr><td><code>pnpm dev</code></td><td>Next 개발 서버</td></tr>
+        <tr><td><code>pnpm lint</code></td><td>ESLint (생성물·빌드 출력은 제외됨)</td></tr>
+        <tr><td><code>npx tsc --noEmit</code></td><td>타입 체크</td></tr>
+        <tr><td><code>@senior-frontend …</code></td><td>시니어 프론트 에이전트에게 작업 위임</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <b>환경변수</b> (<span class="filepath">.env.local</span>): <code>NEXT_PUBLIC_API_URL=http://localhost:4000</code> ·
+      <code>NEXT_PUBLIC_USE_MOCK</code>(미구현 영역 목업) · <code>NEXT_PUBLIC_MOCK_AUTH</code>(데모 유저). 바꾸면 dev 서버 재시작.
+    </div>
+
+    <!-- ===================== 5 ===================== -->
+    <h2 id="agent">5. 에이전트 사용법</h2>
+    <p>
+      <span class="pill agent">senior-frontend</span> 는 이 프로젝트의 모든 아키텍처 규칙(메모리 토큰, 봉투, CSR/SSR 분리, orval 워크플로)을
+      알고 있는 시니어 프론트 개발자다. 프론트 작업은 이 에이전트에게 맡긴다.
+    </p>
+    <div class="grid2">
+      <div class="card">
+        <h3 style="margin-top:0">잘 맡기는 예</h3>
+        <ul>
+          <li>"공개 이력서 상세 페이지 <code>/resumes/[id]</code> 구현해줘"</li>
+          <li>"좋아요 버튼에 useOptimistic 붙여줘"</li>
+          <li>"swagger 새로 동기화하고 바뀐 부분 반영해줘"</li>
+          <li>"이 화면 생성 훅으로 리팩터해줘"</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">에이전트가 먼저 되묻는 상황</h3>
+        <ul>
+          <li>필요한 엔드포인트/필드가 swagger에 <b>없을 때</b></li>
+          <li>응답 구조가 비효율적이거나 봉투가 불일치할 때</li>
+          <li>기획(<span class="filepath">drafted_planning.html</span>)을 바꿔야 할 때</li>
+          <li>개인정보 노출 우려가 있을 때</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ===================== 6 ===================== -->
+    <h2 id="hooks">6. 생성 훅 사용</h2>
+    <p>생성된 훅 이름은 <code>use{Controller}{Operation}</code> 형태다. GET은 <code>useQuery</code>, 그 외(POST/PUT/DELETE)는 <code>useMutation</code>으로 생성된다.</p>
+
+    <h3>조회 (useQuery)</h3>
+<pre><code><span class="tok-s">"use client"</span>;
+<span class="tok-k">import</span> { useUsersControllerGetMyProfile } <span class="tok-k">from</span> <span class="tok-s">"@/lib/api/generated/users/users"</span>;
+
+<span class="tok-k">export default function</span> <span class="tok-f">MePage</span>() {
+  <span class="tok-c">// data = 봉투 벗긴 payload. 401 재시도/리다이렉트는 customFetch가 처리.</span>
+  <span class="tok-k">const</span> { data: me, isLoading, error } = <span class="tok-f">useUsersControllerGetMyProfile</span>();
+
+  <span class="tok-k">if</span> (isLoading) <span class="tok-k">return</span> &lt;<span class="tok-t">Spinner</span> /&gt;;
+  <span class="tok-k">return</span> &lt;<span class="tok-t">h1</span>&gt;{me?.nickname}&lt;/<span class="tok-t">h1</span>&gt;;
+}</code></pre>
+
+    <h3>변경 (useMutation)</h3>
+<pre><code><span class="tok-k">import</span> { useUsersControllerUpdateMyProfile } <span class="tok-k">from</span> <span class="tok-s">"@/lib/api/generated/users/users"</span>;
+<span class="tok-k">import</span> { useQueryClient } <span class="tok-k">from</span> <span class="tok-s">"@tanstack/react-query"</span>;
+
+<span class="tok-k">const</span> qc = <span class="tok-f">useQueryClient</span>();
+<span class="tok-k">const</span> { mutate, isPending } = <span class="tok-f">useUsersControllerUpdateMyProfile</span>({
+  mutation: {
+    onSuccess: () =&gt; qc.<span class="tok-f">invalidateQueries</span>(), <span class="tok-c">// 관련 쿼리 무효화</span>
+  },
+});
+
+<span class="tok-f">mutate</span>({ data: { nickname: <span class="tok-s">"새닉네임"</span> } });</code></pre>
+
+    <div class="warn">
+      <b>반환 타입이 <code>void</code>로 나온다면?</b> 해당 엔드포인트의 <b>응답 스키마가 swagger에 없는 것</b>이다.
+      코드로 캐스팅해서 떼우지 말고, 백엔드에 응답 DTO를 문서화해 달라고 요청한다(→ <a href="#contract">7장</a>).
+    </div>
+
+    <h3>임시 래퍼 (swagger에 아직 없는 영역)</h3>
+    <p>resumes·likes·bookmarks처럼 백엔드 미구현 계약은 <code>src/lib/api/*.ts</code> + <code>USE_MOCK</code> 래퍼로 임시 진행하다가, 계약이 swagger에 들어오면 생성 훅으로 교체한다.</p>
+
+    <!-- ===================== 7 ===================== -->
+    <h2 id="contract">7. 계약 변경 흐름 <span class="muted" style="font-size:14px">(시니어의 핵심 역할)</span></h2>
+    <p>프론트에서 계약 부족을 발견하면 <b>코드로 우회하지 않고</b> 다음 형식으로 백엔드(=당신)에게 요청한다:</p>
+    <div class="card">
+      <ol style="margin:0">
+        <li><b>왜 필요한지</b> — 어느 화면/동선에서 무엇이 막히는지</li>
+        <li><b>제안 스키마</b> — 요청/응답 예시(JSON)</li>
+        <li><b>영향 범위</b> — 다른 엔드포인트·화면에 미치는 영향</li>
+      </ol>
+    </div>
+    <p>대표적인 요청 트리거:</p>
+    <ul>
+      <li>응답에 <b>content 스키마가 없어</b> 생성 훅이 <code>void</code> → 응답 DTO 명시 요청</li>
+      <li>봉투(<code>{ statusCode, timestamp, data }</code>)가 일부 엔드포인트에만 적용 → 전 엔드포인트 통일 요청</li>
+      <li>목록인데 <b>페이지네이션이 없음</b> → cursor/page 파라미터 추가 요청</li>
+      <li>공개 응답에 <b>본명·연락처 등 식별정보</b> 포함 → 제거 요청 (개인정보 정책)</li>
+    </ul>
+    <div class="note">반영 흐름: 백엔드 수정 → <code>/sync-swagger</code> → <code>pnpm gen:api</code> → 화면 정합.</div>
+
+    <!-- ===================== 8 ===================== -->
+    <h2 id="rules">8. 규칙 · 금지</h2>
+    <div class="grid2">
+      <div class="card">
+        <h3 style="margin-top:0; color:var(--accent-2)">✅ 한다</h3>
+        <ul>
+          <li>swagger에 있는 건 <b>생성 훅</b>으로</li>
+          <li>swagger 바뀌면 <b>즉시 재생성</b></li>
+          <li>계약 부족은 <b>백엔드에 요청</b></li>
+          <li>모든 호출 <code>credentials:'include'</code> (customFetch가 처리)</li>
+          <li>OAuth 콜백은 <b>클라이언트</b> page.tsx</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0; color:var(--danger)">🚫 안 한다</h3>
+        <ul>
+          <li><span class="filepath">generated/</span> 수동 편집</li>
+          <li>swagger에 없는 엔드포인트 <b>추측 호출</b></li>
+          <li>타입·fetch를 <b>손으로</b> 작성(임시 영역 제외)</li>
+          <li>accessToken을 localStorage에 저장</li>
+          <li><code>@supabase/*</code> 재도입 (마이그레이션으로 제거됨)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ===================== 9 ===================== -->
+    <h2 id="trouble">9. 트러블슈팅</h2>
+    <table>
+      <thead><tr><th>증상</th><th>원인 · 해결</th></tr></thead>
+      <tbody>
+        <tr><td>생성 훅 <code>data</code>가 <code>void</code>/<code>unknown</code></td><td>swagger에 응답 스키마 없음 → 백엔드에 응답 DTO 문서화 요청.</td></tr>
+        <tr><td><code>/sync-swagger</code> 실패</td><td>백엔드 미실행 또는 포트 불일치(4000). <code>/docs</code>가 JSON을 반환하는지 확인.</td></tr>
+        <tr><td>훅 호출 시 <code>No QueryClient set</code></td><td>컴포넌트가 <code>QueryProvider</code> 밖. root layout 래핑 확인.</td></tr>
+        <tr><td>401 무한 루프 / 로그인 튕김</td><td>refresh 쿠키 미전송. 모든 호출 <code>credentials:'include'</code> 확인(customFetch 경유 시 자동).</td></tr>
+        <tr><td>OAuth 콜백에서 토큰 못 받음</td><td>콜백을 Server Component로 만들면 깨짐 — 해시(<code>#accessToken</code>)는 서버로 안 감. 클라이언트 page.tsx로.</td></tr>
+        <tr><td><code>pnpm lint</code>가 빌드 출력까지 검사</td><td>해결됨 — <span class="filepath">eslint.config.mjs</span>가 <code>.next</code>·<code>generated</code> 제외.</td></tr>
+        <tr><td>재생성했는데 반영 안 됨</td><td><code>pnpm gen:api</code> 빠뜨림. swagger 변경 후 항상 재생성.</td></tr>
+      </tbody>
+    </table>
+
+    <footer>
+      Drafted 프론트엔드 워크플로 가이드 · 단일 진실 출처: <span class="filepath">api/swagger.json</span> ·
+      관련 문서: <span class="filepath">CLAUDE.md</span>, <span class="filepath">drafted_planning.html</span>
+    </footer>
+  </main>
+</div>
+</body>
+</html>

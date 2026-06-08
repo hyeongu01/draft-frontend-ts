@@ -5,11 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import ResumeCard from "@/components/resume/ResumeCard";
 import { useUserContext } from "@/context/AuthContext";
-import {
-  getMyResumes,
-  getMyBookmarks,
-  getMyLikes,
-} from "@/lib/api/resumes";
+import { getMyBookmarks, getMyLikes } from "@/lib/api/resumes";
+import { useResumesControllerFindAll } from "@/lib/api/generated/resumes-private/resumes-private";
+import { useCategories } from "@/hooks/useCategories";
 import type { Resume } from "@/lib/types";
 
 type Tab = "resumes" | "saved" | "liked";
@@ -114,17 +112,59 @@ function TabContent({
   tab: Tab;
   fallbackNickname: string;
 }) {
+  // "내 이력서"는 실 엔드포인트(GET /me/resumes), saved/liked는 아직 mock.
+  if (tab === "resumes")
+    return <OwnResumesTab fallbackNickname={fallbackNickname} />;
+  return <MockListTab tab={tab} />;
+}
+
+// 내 이력서 — GET /me/resumes (소유자 전용). 직무는 categoryId→이름 룩업.
+function OwnResumesTab({ fallbackNickname }: { fallbackNickname: string }) {
+  const { data, isLoading, isError } = useResumesControllerFindAll({
+    limit: 50,
+  });
+  const { nameById } = useCategories();
+
+  if (isLoading) return <ListSkeleton />;
+
+  const items = data?.items ?? [];
+  if (isError || !items.length)
+    return (
+      <Empty
+        title="아직 작성한 이력서가 없어요"
+        sub='위 "+ 새 이력서" 버튼으로 시작해보세요'
+      />
+    );
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {items.map((r) => (
+        <ResumeCard
+          key={r.id}
+          href={`/me/resumes/${r.id}/edit`}
+          title={r.title}
+          description={r.description}
+          jobRole={r.categoryId != null ? nameById.get(r.categoryId) ?? null : null}
+          experienceYears={r.careerYears ?? 0}
+          nickname={fallbackNickname}
+          likeCount={r.likeCount}
+          scrapCount={r.scrapCount}
+          isPublic={r.isPublic}
+          // viewCount 미존재(계약) → 표시 생략
+        />
+      ))}
+    </div>
+  );
+}
+
+// 보관함/좋아요 — 계약 미정, mock 유지.
+function MockListTab({ tab }: { tab: "saved" | "liked" }) {
   const [resumes, setResumes] = useState<Resume[] | null>(null);
 
   useEffect(() => {
     let alive = true;
     setResumes(null);
-    const loader =
-      tab === "resumes"
-        ? getMyResumes
-        : tab === "saved"
-          ? getMyBookmarks
-          : getMyLikes;
+    const loader = tab === "saved" ? getMyBookmarks : getMyLikes;
     loader()
       .then((data) => alive && setResumes(data))
       .catch(() => alive && setResumes([]));
@@ -135,36 +175,27 @@ function TabContent({
 
   if (resumes === null) return <ListSkeleton />;
 
-  if (!resumes.length) {
-    if (tab === "resumes")
-      return (
-        <Empty
-          title="아직 작성한 이력서가 없어요"
-          sub='위 "+ 새 이력서" 버튼으로 시작해보세요'
-        />
-      );
-    if (tab === "saved")
-      return <Empty title="보관한 이력서가 없어요" sub="피드에서 🔖로 보관해보세요" />;
-    return <Empty title="좋아요한 이력서가 없어요" sub="피드에서 ♥로 표현해보세요" />;
-  }
-
-  const ownTab = tab === "resumes";
+  if (!resumes.length)
+    return tab === "saved" ? (
+      <Empty title="보관한 이력서가 없어요" sub="피드에서 🔖로 보관해보세요" />
+    ) : (
+      <Empty title="좋아요한 이력서가 없어요" sub="피드에서 ♥로 표현해보세요" />
+    );
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       {resumes.map((r) => (
         <ResumeCard
           key={r.id}
-          href={ownTab ? `/me/resumes/${r.id}/edit` : `/resumes/${r.id}`}
+          href={`/resumes/${r.id}`}
           title={r.title}
           description={r.description}
-          jobRole={r.job_role}
-          experienceYears={r.experience_years}
-          nickname={ownTab ? fallbackNickname : r.author?.nickname ?? "익명"}
-          likeCount={r.like_count}
-          saveCount={r.save_count}
-          viewCount={r.view_count}
-          isPublic={ownTab ? r.is_public : undefined}
+          jobRole={r.jobRole}
+          experienceYears={r.experienceYears}
+          nickname={r.author?.nickname ?? "익명"}
+          likeCount={r.likeCount}
+          scrapCount={r.scrapCount}
+          viewCount={r.viewCount}
         />
       ))}
     </div>

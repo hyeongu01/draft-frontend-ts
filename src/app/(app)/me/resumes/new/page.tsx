@@ -3,25 +3,23 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { createResume } from "@/lib/api/resumes";
+import { useResumesControllerCreateItem } from "@/lib/api/generated/resumes-private/resumes-private";
+import { EMPTY_DOC } from "@/types/resume";
 
 export default function Page() {
   const router = useRouter();
-  const [title, setTitle] = useState("");
+  const { mutateAsync, isPending } = useResumesControllerCreateItem();
   const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmed = title.trim();
-    if (!trimmed) return setError("제목을 입력해주세요");
-    setPending(true);
+  const onCreate = async () => {
     setError(null);
     try {
-      const { id } = await createResume(trimmed);
-      router.push(`/me/resumes/${id}/edit`);
+      // 빈 초안으로 생성 — 제목·본문은 에디터에서 채운다. 생성 직후엔 비공개.
+      const created = await mutateAsync({
+        data: { title: "", description: "", content: EMPTY_DOC },
+      });
+      router.push(`/me/resumes/${created.id}/edit`);
     } catch {
-      setPending(false);
       setError("이력서를 만들지 못했어요. 다시 시도해주세요.");
     }
   };
@@ -34,36 +32,20 @@ export default function Page() {
 
       <h1 className="text-2xl font-medium mt-6 mb-2">새 이력서</h1>
       <p className="text-sm text-gray-500 mb-6">
-        어떤 시기의 이력서인가요? 회사명이나 직무로 짧게 적어주세요.
+        빈 이력서를 만들고, 에디터에서 제목과 내용을 채워보세요. 생성 직후에는
+        비공개 상태예요.
       </p>
 
-      <form onSubmit={onSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium mb-1">
-            제목
-          </label>
-          <input
-            id="title"
-            name="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="예: 스타트업 시니어 디자이너 (2024–현재)"
-            required
-            autoFocus
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-          />
-        </div>
+      {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
-
-        <button
-          type="submit"
-          disabled={pending}
-          className="w-full px-4 py-2 bg-black text-white rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50"
-        >
-          {pending ? "만드는 중..." : "만들기"}
-        </button>
-      </form>
+      <button
+        type="button"
+        onClick={onCreate}
+        disabled={isPending}
+        className="w-full px-4 py-2 bg-black text-white rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50"
+      >
+        {isPending ? "만드는 중..." : "빈 이력서 만들기"}
+      </button>
     </div>
   );
 }

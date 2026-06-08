@@ -1,45 +1,48 @@
 // src/app/(app)/me/resumes/[id]/edit/EditResumeForm.tsx
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { updateResume, deleteResume } from "@/lib/api/resumes";
+import {
+  useResumesControllerUpdateItem,
+  useResumesControllerDeleteItem,
+} from "@/lib/api/generated/resumes-private/resumes-private";
+import { useCategories } from "@/hooks/useCategories";
 import ResumeSections from "@/components/resume/ResumeSections";
 import {
   normalizeContent,
   EMPTY_BODY,
   type ResumeSection,
 } from "@/types/resume";
+import type { ResumeResponseType } from "@/lib/api/generated/model";
 
-type Resume = {
-  id: string;
-  title: string;
-  description: string | null;
-  job_role: string | null;
-  is_public: boolean;
-  content: unknown;
-  experience_years: number;
-};
-
-export default function EditResumeForm({ resume }: { resume: Resume }) {
+export default function EditResumeForm({
+  resume,
+}: {
+  resume: ResumeResponseType;
+}) {
   const router = useRouter();
+  const { categories, isLoading: categoriesLoading } = useCategories();
+  const updateMut = useResumesControllerUpdateItem();
+  const deleteMut = useResumesControllerDeleteItem();
+  const isPending = updateMut.isPending || deleteMut.isPending;
+
   const [title, setTitle] = useState(resume.title);
-  const [description, setDescription] = useState(resume.description ?? "");
-  const [jobRole, setJobRole] = useState(resume.job_role ?? "");
-  const [isPublic, setIsPublic] = useState(resume.is_public);
-  const [experienceYears, setExperienceYears] = useState(
-    resume.experience_years,
+  const [description, setDescription] = useState(resume.description);
+  // 직무 = 카테고리(categoryId) 참조. 미선택은 null.
+  const [categoryId, setCategoryId] = useState<number | null>(
+    resume.categoryId ?? null,
   );
+  const [isPublic, setIsPublic] = useState(resume.isPublic);
+  // 연차 = 백엔드 careerYears
+  const [careerYears, setCareerYears] = useState(resume.careerYears ?? 0);
   const yearsError =
-    experienceYears < 0 || experienceYears > 100
-      ? "0~100 사이로 입력해주세요"
-      : null;
+    careerYears < 0 || careerYears > 100 ? "0~100 사이로 입력해주세요" : null;
   // content(JSONB) → 섹션 배열로 정규화 (한 번만)
   const [sections, setSections] = useState<ResumeSection[]>(
     () => normalizeContent(resume.content).sections,
   );
-  const [isPending, startTransition] = useTransition();
   const [savedAt, setSavedAt] = useState<Date | null>(null);
 
   const updateSectionBody = (id: string, body: object) =>
@@ -64,36 +67,36 @@ export default function EditResumeForm({ resume }: { resume: Resume }) {
 
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (yearsError) return; // 검증 실패 시 저장 차단
-    startTransition(async () => {
-      try {
-        await updateResume(resume.id, {
+    try {
+      await updateMut.mutateAsync({
+        id: resume.id,
+        data: {
           title,
           description: description.trim(),
-          job_role: jobRole.trim(),
-          is_public: isPublic,
           content: { version: 1, sections },
-          experience_years: experienceYears,
-        });
-        setSaveError(null);
-        setSavedAt(new Date());
-      } catch {
-        setSaveError("저장에 실패했어요. 다시 시도해주세요.");
-      }
-    });
+          careerYears,
+          isPublic,
+          // 미선택(null)이면 필드 자체를 보내지 않음
+          ...(categoryId != null ? { categoryId } : {}),
+        },
+      });
+      setSaveError(null);
+      setSavedAt(new Date());
+    } catch {
+      setSaveError("저장에 실패했어요. 다시 시도해주세요.");
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!confirm("정말 삭제할까요? 되돌릴 수 없어요.")) return;
-    startTransition(async () => {
-      try {
-        await deleteResume(resume.id);
-        router.push("/me");
-      } catch {
-        setSaveError("삭제에 실패했어요. 다시 시도해주세요.");
-      }
-    });
+    try {
+      await deleteMut.mutateAsync({ id: resume.id });
+      router.push("/me");
+    } catch {
+      setSaveError("삭제에 실패했어요. 다시 시도해주세요.");
+    }
   };
 
   return (
@@ -185,13 +188,23 @@ export default function EditResumeForm({ resume }: { resume: Resume }) {
 
           <div className="mb-4">
             <label className="block text-xs text-gray-500 mb-1">직무</label>
-            <input
-              value={jobRole}
-              onChange={(e) => setJobRole(e.target.value)}
-              maxLength={40}
-              placeholder="예: UX 디자이너"
-              className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-black"
-            />
+            <select
+              value={categoryId ?? ""}
+              onChange={(e) =>
+                setCategoryId(
+                  e.target.value === "" ? null : Number(e.target.value),
+                )
+              }
+              disabled={categoriesLoading}
+              className="w-full px-3 py-2 border rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-50"
+            >
+              <option value="">선택 안 함</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="mb-4">
@@ -200,9 +213,9 @@ export default function EditResumeForm({ resume }: { resume: Resume }) {
               type="number"
               min={0}
               max={100}
-              value={experienceYears}
+              value={careerYears}
               onChange={(e) =>
-                setExperienceYears(
+                setCareerYears(
                   e.target.value === "" ? 0 : Number(e.target.value),
                 )
               }

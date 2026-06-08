@@ -1,41 +1,40 @@
 "use client";
-// 백엔드가 OAuth 성공 후 FRONTEND_URL/<callback>#accessToken=... 로 리다이렉트.
-// 해시는 서버로 전송되지 않으므로 반드시 클라이언트에서 파싱한다.
-// /auth/callback 과 /auth/google/callback 양쪽에서 동일하게 사용.
+// 구글이 인가 코드를 쿼리로 실어 /auth/google/callback 으로 리다이렉트한다.
+//   /auth/google/callback?code=...   (해시 아님 — 쿼리)
+// 코드를 백엔드로 교환(POST /auth/google/callback)하면 accessToken+user(바디) + refreshToken(쿠키)을 받는다.
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { saveAccessToken } from "@/lib/auth/token";
-import { refresh } from "@/lib/api/client";
-import { getMe } from "@/lib/api/users";
+import { authControllerGoogleOAuthCallback } from "@/lib/api/generated/auth/auth";
 import { useUserContext } from "@/context/AuthContext";
 
 export default function AuthCallbackHandler() {
   const router = useRouter();
-  const { reload } = useUserContext();
+  const { setSession } = useUserContext();
 
   useEffect(() => {
     (async () => {
-      // 1) 해시(또는 쿼리)에서 accessToken 추출 → 메모리에 저장
-      const hash = window.location.hash.slice(1);
-      const search = window.location.search.slice(1);
-      const params = new URLSearchParams(hash || search);
-      const hashToken = params.get("accessToken");
-      if (hashToken) saveAccessToken(hashToken);
+      const params = new URLSearchParams(window.location.search.slice(1));
+      const code = params.get("code");
+      const oauthError = params.get("error"); // 사용자가 동의 거부 등
+      // URL에서 code 제거 (재교환·유출 방지)
       window.history.replaceState({}, "", window.location.pathname);
 
-      // 2) 토큰 확보 (해시가 없으면 refresh 쿠키로)
-      const token = hashToken ?? (await refresh());
-      if (!token) {
+      if (oauthError || !code) {
         router.replace("/error?reason=oauth_failed");
         return;
       }
 
-      // 3) 프로필 조회 → 닉네임 유무로 분기
-      const me = await getMe().catch(() => null);
-      await reload(); // 전역 컨텍스트 동기화
-      if (!me) router.replace("/error?reason=no_user");
-      else if (me.nickname) router.replace("/");
-      else router.replace("/onboarding");
+      try {
+        // 인가 코드 교환 → accessToken+user(바디) + refreshToken(쿠키, device_id 동봉)
+        const { accessToken, user } = await authControllerGoogleOAuthCallback({
+          code,
+        });
+        setSession(accessToken, user);
+        // 닉네임 유무로 분기 — 신규(null)는 온보딩으로
+        router.replace(user.nickname ? "/" : "/onboarding");
+      } catch {
+        router.replace("/error?reason=oauth_failed");
+      }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

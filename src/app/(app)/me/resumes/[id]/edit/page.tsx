@@ -1,11 +1,10 @@
 "use client";
 // 이력서 편집 — CSR. 소유자 전용 데이터라 클라이언트에서 인증 fetch.
-import { Suspense, use, useEffect, useState } from "react";
+import { Suspense, use, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import EditResumeForm from "./EditResumeForm";
-import { getResume } from "@/lib/api/resumes";
+import { useResumesControllerFindOne } from "@/lib/api/generated/resumes-private/resumes-private";
 import { useUserContext } from "@/context/AuthContext";
-import type { Resume } from "@/lib/types";
 
 export default function EditResumePage({
   params,
@@ -21,27 +20,23 @@ export default function EditResumePage({
 
 function EditResumeLoader({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { user, isLoading } = useUserContext();
+  const { user, isLoading: authLoading } = useUserContext();
   const router = useRouter();
-  const [resume, setResume] = useState<Resume | null>(null);
-  const [notFound, setNotFound] = useState(false);
+
+  // GET /me/resumes/{id} (소유자 전용). 로그인 확정 후에만 조회.
+  const {
+    data: resume,
+    isLoading,
+    isError,
+  } = useResumesControllerFindOne(id, {
+    query: { enabled: !!user, retry: false },
+  });
 
   useEffect(() => {
-    if (isLoading) return;
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-    let alive = true;
-    getResume(id)
-      .then((data) => alive && setResume(data))
-      .catch(() => alive && setNotFound(true));
-    return () => {
-      alive = false;
-    };
-  }, [id, user, isLoading, router]);
+    if (!authLoading && !user) router.replace("/login");
+  }, [authLoading, user, router]);
 
-  if (notFound) {
+  if (isError) {
     return (
       <div className="max-w-2xl mx-auto p-6 text-center text-gray-500">
         <p>이력서를 찾을 수 없어요.</p>
@@ -49,7 +44,7 @@ function EditResumeLoader({ params }: { params: Promise<{ id: string }> }) {
     );
   }
 
-  if (!resume) return <EditSkeleton />;
+  if (authLoading || isLoading || !resume) return <EditSkeleton />;
 
   return <EditResumeForm resume={resume} />;
 }

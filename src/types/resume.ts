@@ -18,25 +18,6 @@ export function formatExperience(years: number): string {
   return years === 0 ? "신입" : `${years}년차`;
 }
 
-// ProseMirror JSON에서 텍스트 노드만 재귀로 긁어 평문 추출
-function collectText(node: unknown): string {
-  if (!node || typeof node !== "object") return "";
-  const n = node as { text?: string; content?: unknown[] };
-  if (typeof n.text === "string") return n.text;
-  if (Array.isArray(n.content)) return n.content.map(collectText).join(" ");
-  return "";
-}
-
-// 피드 카드용 본문 스니펫 — 내용 있는 첫 섹션의 평문을 잘라서 반환
-export function resumeSnippet(content: unknown, max = 100): string {
-  const { sections } = normalizeContent(content);
-  for (const s of sections) {
-    const text = collectText(s.body).replace(/\s+/g, " ").trim();
-    if (text) return text.length > max ? `${text.slice(0, max)}…` : text;
-  }
-  return "";
-}
-
 // 기획서 ⑤ 와이어프레임의 기본 섹션
 export const DEFAULT_SECTION_TITLES = [
   "자기소개",
@@ -48,6 +29,13 @@ export const DEFAULT_SECTION_TITLES = [
 
 // 빈 ProseMirror 본문
 export const EMPTY_BODY: object = {};
+
+// 빈 Tiptap 에디터의 저장 형식 (StarterKit 빈 문서 = editor.getJSON()).
+// 이력서 최초 생성 시 content 기본값으로 사용.
+export const EMPTY_DOC = {
+  type: "doc",
+  content: [{ type: "paragraph" }],
+} as const;
 
 // DB의 content(빈 객체·레거시 단일 Tiptap 문서·신규 구조 모두)를 ResumeContent로 정규화.
 // 프리셋 id는 SSR/CSR 동일하도록 고정값 사용(랜덤 id는 hydration 불일치 유발).

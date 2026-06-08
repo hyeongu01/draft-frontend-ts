@@ -26,7 +26,7 @@ export default function OnboardingPage(): JSX.Element {
       await refreshProfile();
       setIsSubmitting(false);
       router.replace("/");
-    } catch (e) {
+    } catch {
       setIsSubmitting(false);
       router.push("/error?reason=signup_failed");
     }

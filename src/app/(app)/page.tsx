@@ -39,12 +39,12 @@ async function Feed({ searchParams }: { searchParams: SearchParams }) {
               href={`/resumes/${r.id}`}
               title={r.title}
               description={r.description}
-              jobRole={r.job_role}
-              experienceYears={r.experience_years}
+              jobRole={r.jobRole}
+              experienceYears={r.experienceYears}
               nickname={r.author?.nickname ?? "익명"}
-              likeCount={r.like_count}
-              saveCount={r.save_count}
-              viewCount={r.view_count}
+              likeCount={r.likeCount}
+              scrapCount={r.scrapCount}
+              viewCount={r.viewCount}
             />
           ))}
         </div>

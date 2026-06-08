@@ -7,6 +7,7 @@ import {
   saveAccessToken,
   clearAccessToken,
 } from "@/lib/auth/token";
+import type { User } from "@/lib/types";
 
 const API = process.env.NEXT_PUBLIC_API_URL!;
 
@@ -21,7 +22,11 @@ export class ApiError extends Error {
 }
 
 // refresh_token 쿠키로 accessToken 재발급 (바디 없음).
-export async function refresh(): Promise<string | null> {
+// 응답 data = { accessToken, user } (swagger AccessTokenResponseType) → user까지 반환해
+// 부팅 시 별도 GET /users/me 왕복을 생략할 수 있게 한다.
+export type RefreshResult = { accessToken: string; user: User };
+
+export async function refresh(): Promise<RefreshResult | null> {
   try {
     const res = await fetch(`${API}/auth/refresh`, {
       method: "POST",
@@ -32,9 +37,13 @@ export async function refresh(): Promise<string | null> {
       return null;
     }
     const json = await res.json().catch(() => null);
-    const token = json?.data?.accessToken ?? null;
-    saveAccessToken(token);
-    return token;
+    const accessToken = json?.data?.accessToken ?? null;
+    if (!accessToken) {
+      saveAccessToken(null);
+      return null;
+    }
+    saveAccessToken(accessToken);
+    return { accessToken, user: json.data.user as User };
   } catch {
     saveAccessToken(null);
     return null;
@@ -65,13 +74,13 @@ export async function apiFetch(
 
   let res = await call(getAccessToken());
   if (res.status === 401) {
-    const token = await refresh();
-    if (!token) {
+    const session = await refresh();
+    if (!session) {
       clearAccessToken();
       if (typeof window !== "undefined") window.location.href = "/login";
       throw new ApiError(401, "unauthenticated");
     }
-    res = await call(token);
+    res = await call(session.accessToken);
   }
   return res;
 }
