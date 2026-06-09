@@ -35,7 +35,7 @@
 - swagger.json 갱신 방법 2가지:
   1. 사용자가 직접 `api/swagger.json`을 교체
   2. `sync-swagger` 스킬 — 로컬 백엔드(`http://localhost:4000/docs`)를 호출해 `api/swagger.json`으로 동기화
-- **API 코드는 orval로 자동 생성**한다: `api/swagger.json` → TS 타입 + TanStack Query 훅 (`pnpm gen:api` → `src/lib/api/generated/`). swagger가 바뀌면 항상 재생성한다. 타입·훅을 손으로 짜지 않는다.
+- **API 코드는 orval로 자동 생성**한다: `api/swagger.json` → TS 타입 + TanStack Query 훅 (`npm run gen:api` → `src/lib/api/generated/`). swagger가 바뀌면 항상 재생성한다. 타입·훅을 손으로 짜지 않는다.
 - **시니어 프론트로서 계약에 의견을 낸다.** 누락 엔드포인트/필드, 비효율 응답(N+1·페이지네이션 부재), 봉투 불일치, 네이밍·nullable 모호성, 개인정보 우려를 발견하면 *우회하지 말고* "왜 필요한지 + 제안 스키마(요청/응답 예시) + 영향 범위"를 갖춰 사용자에게 요청한다.
 - 백엔드 미구현 계약은 `USE_MOCK` + `src/lib/api/mock.ts`로 임시 진행하거나 TODO로 막는다.
 
@@ -146,7 +146,7 @@ export default function MePage() {
 ### 코드 생성 / 동기화
 
 ```bash
-pnpm gen:api      # api/swagger.json → src/lib/api/generated/ (타입+훅)
+npm run gen:api   # api/swagger.json → src/lib/api/generated/ (타입+훅)
 # 백엔드 계약이 바뀌면: /sync-swagger 로 swagger.json 갱신 후 위 명령으로 재생성
 ```
 
@@ -229,3 +229,4 @@ export default async function ResumePage({ params }) {
 - Next 15부터 `params`는 Promise → `await params`.
 - 환경변수(`NEXT_PUBLIC_API_URL`) 바꿨으면 dev 서버 재시작 필수.
 - `@supabase/*` 재도입 금지 (마이그레이션으로 제거됨).
+- **패키지 매니저는 npm**(`package-lock.json`이 정본). `pnpm`/`yarn` 쓰지 말 것 — 다른 락파일이 생기면 Vercel `frozen-lockfile` 빌드가 깨진다. 의존성은 항상 `npm install`/`npm i <pkg>`.
