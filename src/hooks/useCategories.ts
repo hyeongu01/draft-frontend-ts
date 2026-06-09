@@ -12,7 +12,7 @@ export function useCategories() {
     { query: { staleTime: 1000 * 60 * 60 } }, // 1시간 캐시
   );
 
-  const categories = data?.items ?? [];
+  const categories = useMemo(() => data?.items ?? [], [data?.items]);
 
   const nameById = useMemo(() => {
     const m = new Map<number, string>();
