@@ -15,6 +15,7 @@ export default function OwnerEditLink({
   return (
     <Link
       href={`/me/resumes/${resumeId}/edit`}
+      prefetch={false}
       className="text-sm text-gray-500 hover:underline"
     >
       편집 →

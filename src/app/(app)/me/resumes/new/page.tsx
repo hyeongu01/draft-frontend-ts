@@ -26,7 +26,7 @@ export default function Page() {
 
   return (
     <div className="max-w-md mx-auto p-6">
-      <Link href="/me" className="text-sm text-gray-500 hover:underline">
+      <Link href="/me" prefetch={false} className="text-sm text-gray-500 hover:underline">
         ← 내 이력서로
       </Link>
 

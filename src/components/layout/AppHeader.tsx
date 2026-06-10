@@ -20,7 +20,11 @@ export default function AppHeader() {
     <header className="sticky top-0 z-20 bg-white/90 backdrop-blur border-b">
       <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
         <div className="flex items-center gap-7">
-          <Link href="/" className="text-[15px] font-semibold tracking-tight">
+          <Link
+            href="/"
+            prefetch={false}
+            className="text-[15px] font-semibold tracking-tight"
+          >
             drafted
           </Link>
           <nav className="flex items-center gap-5 text-[13px]">
@@ -41,6 +45,7 @@ export default function AppHeader() {
                 <Link
                   key={tab.href}
                   href={tab.href}
+                  prefetch={false}
                   className={
                     active
                       ? "text-gray-900 font-medium border-b-[1.5px] border-gray-900 pb-0.5"
@@ -57,6 +62,7 @@ export default function AppHeader() {
         <div className="flex items-center gap-3">
           <Link
             href="/me"
+            prefetch={false}
             aria-label="마이페이지"
             className="w-7 h-7 rounded-full bg-gray-100 text-gray-600 text-xs font-semibold flex items-center justify-center hover:bg-gray-200"
           >

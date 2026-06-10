@@ -75,6 +75,7 @@ function MeContent() {
         </button>
         <Link
           href="/me/resumes/new"
+          prefetch={false}
           className="px-4 py-2 bg-black text-white rounded-md text-sm font-medium hover:opacity-90"
         >
           + 새 이력서
@@ -87,6 +88,7 @@ function MeContent() {
           return (
             <Link
               key={t.key}
+              prefetch={false}
               href={t.key === "resumes" ? "/me" : `/me?tab=${t.key}`}
               className={`px-3 py-2.5 text-sm -mb-px border-b-2 ${
                 isActive

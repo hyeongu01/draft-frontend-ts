@@ -19,6 +19,7 @@ export default function FilterChips({ years }: { years: string }) {
         return (
           <Link
             key={y.key || "all"}
+            prefetch={false}
             href={href}
             className={`px-3 py-1 rounded-full text-xs border transition-colors ${
               active

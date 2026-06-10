@@ -35,7 +35,7 @@ async function ResumeDetail({ params }: { params: Promise<{ id: string }> }) {
   return (
     <>
       <div className="flex items-center justify-between mb-6">
-        <Link href="/" className="text-sm text-gray-500 hover:underline">
+        <Link href="/" prefetch={false} className="text-sm text-gray-500 hover:underline">
           ← 피드로
         </Link>
         <OwnerEditLink resumeId={resume.id} ownerId={resume.userId} />

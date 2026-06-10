@@ -104,7 +104,7 @@ export default function EditResumeForm({
       {/* 툴바 */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <Link href="/me" className="text-sm text-gray-500 hover:underline">
+          <Link href="/me" prefetch={false} className="text-sm text-gray-500 hover:underline">
             ← 내 이력서로
           </Link>
           {saveError ? (
