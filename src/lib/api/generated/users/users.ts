@@ -27,6 +27,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  IdsResponseType,
   UpdateUserDto,
   UserResponseType,
   UsersControllerDeleteMyProfile200,
@@ -237,3 +238,189 @@ const {mutation: mutationOptions} = options ?
       > => {
       return useMutation(getUsersControllerDeleteMyProfileMutationOptions(options), queryClient);
     }
+    /**
+ * 현재 로그인한 유저가 좋아요한 이력서의 id 목록을 반환합니다. 목록 화면에서 좋아요 상태를 표시할 때 대조 용도로 사용합니다. 인증이 필요하며, 좋아요한 이력서가 없으면 빈 배열을 반환합니다.
+ * @summary user's likes resume ids
+ */
+export const usersControllerGetLikeIds = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customFetch<IdsResponseType>(
+      {url: `/users/me/likes`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getUsersControllerGetLikeIdsQueryKey = () => {
+    return [
+    `/users/me/likes`
+    ] as const;
+    }
+
+
+export const getUsersControllerGetLikeIdsQueryOptions = <TData = Awaited<ReturnType<typeof usersControllerGetLikeIds>>, TError = ErrorType<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetLikeIds>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getUsersControllerGetLikeIdsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersControllerGetLikeIds>>> = ({ signal }) => usersControllerGetLikeIds(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetLikeIds>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type UsersControllerGetLikeIdsQueryResult = NonNullable<Awaited<ReturnType<typeof usersControllerGetLikeIds>>>
+export type UsersControllerGetLikeIdsQueryError = ErrorType<void>
+
+
+export function useUsersControllerGetLikeIds<TData = Awaited<ReturnType<typeof usersControllerGetLikeIds>>, TError = ErrorType<void>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetLikeIds>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof usersControllerGetLikeIds>>,
+          TError,
+          Awaited<ReturnType<typeof usersControllerGetLikeIds>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useUsersControllerGetLikeIds<TData = Awaited<ReturnType<typeof usersControllerGetLikeIds>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetLikeIds>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof usersControllerGetLikeIds>>,
+          TError,
+          Awaited<ReturnType<typeof usersControllerGetLikeIds>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useUsersControllerGetLikeIds<TData = Awaited<ReturnType<typeof usersControllerGetLikeIds>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetLikeIds>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary user's likes resume ids
+ */
+
+export function useUsersControllerGetLikeIds<TData = Awaited<ReturnType<typeof usersControllerGetLikeIds>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetLikeIds>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getUsersControllerGetLikeIdsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+/**
+ * 현재 로그인한 유저가 스크랩한 이력서의 id 목록을 반환합니다. 목록 화면에서 스크랩 상태를 표시할 때 대조 용도로 사용합니다. 인증이 필요하며, 스크랩한 이력서가 없으면 빈 배열을 반환합니다.
+ * @summary user's scraps resume ids
+ */
+export const usersControllerGetScrapIds = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customFetch<IdsResponseType>(
+      {url: `/users/me/scraps`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getUsersControllerGetScrapIdsQueryKey = () => {
+    return [
+    `/users/me/scraps`
+    ] as const;
+    }
+
+
+export const getUsersControllerGetScrapIdsQueryOptions = <TData = Awaited<ReturnType<typeof usersControllerGetScrapIds>>, TError = ErrorType<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetScrapIds>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getUsersControllerGetScrapIdsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersControllerGetScrapIds>>> = ({ signal }) => usersControllerGetScrapIds(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetScrapIds>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type UsersControllerGetScrapIdsQueryResult = NonNullable<Awaited<ReturnType<typeof usersControllerGetScrapIds>>>
+export type UsersControllerGetScrapIdsQueryError = ErrorType<void>
+
+
+export function useUsersControllerGetScrapIds<TData = Awaited<ReturnType<typeof usersControllerGetScrapIds>>, TError = ErrorType<void>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetScrapIds>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof usersControllerGetScrapIds>>,
+          TError,
+          Awaited<ReturnType<typeof usersControllerGetScrapIds>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useUsersControllerGetScrapIds<TData = Awaited<ReturnType<typeof usersControllerGetScrapIds>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetScrapIds>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof usersControllerGetScrapIds>>,
+          TError,
+          Awaited<ReturnType<typeof usersControllerGetScrapIds>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useUsersControllerGetScrapIds<TData = Awaited<ReturnType<typeof usersControllerGetScrapIds>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetScrapIds>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary user's scraps resume ids
+ */
+
+export function useUsersControllerGetScrapIds<TData = Awaited<ReturnType<typeof usersControllerGetScrapIds>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetScrapIds>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getUsersControllerGetScrapIdsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+

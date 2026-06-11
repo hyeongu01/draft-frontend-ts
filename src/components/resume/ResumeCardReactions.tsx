@@ -1,4 +1,5 @@
-// src/components/resume/ResumeActions.tsx — 공개 이력서 상세의 좋아요·스크랩 버튼
+// src/components/resume/ResumeCardReactions.tsx — 피드 카드의 좋아요·스크랩 토글
+// ResumeCard의 오버레이 링크 위에 떠야 하므로 relative z-10 필수.
 "use client";
 
 import { Heart, Bookmark } from "lucide-react";
@@ -10,7 +11,7 @@ type Props = {
   scrapCount: number;
 };
 
-export default function ResumeActions({
+export default function ResumeCardReactions({
   resumeId,
   likeCount,
   scrapCount,
@@ -21,19 +22,21 @@ export default function ResumeActions({
   });
 
   return (
-    <div className="flex items-center gap-2">
+    <>
       <button
         type="button"
         onClick={like.toggle}
         disabled={like.pending}
         aria-pressed={like.on}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors disabled:opacity-60 ${
-          like.on
-            ? "border-red-200 bg-red-50 text-red-600"
-            : "border-gray-200 text-gray-600 hover:bg-gray-50"
+        aria-label="좋아요"
+        className={`relative z-10 flex items-center gap-1 transition-colors disabled:opacity-60 ${
+          like.on ? "text-red-500" : "text-gray-400 hover:text-red-500"
         }`}
       >
-        <Heart className="w-4 h-4" fill={like.on ? "currentColor" : "none"} />
+        <Heart
+          className="w-3.5 h-3.5"
+          fill={like.on ? "currentColor" : "none"}
+        />
         {like.count}
       </button>
 
@@ -42,18 +45,17 @@ export default function ResumeActions({
         onClick={scrap.toggle}
         disabled={scrap.pending}
         aria-pressed={scrap.on}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors disabled:opacity-60 ${
-          scrap.on
-            ? "border-amber-200 bg-amber-50 text-amber-600"
-            : "border-gray-200 text-gray-600 hover:bg-gray-50"
+        aria-label="스크랩"
+        className={`relative z-10 flex items-center gap-1 transition-colors disabled:opacity-60 ${
+          scrap.on ? "text-amber-500" : "text-gray-400 hover:text-amber-500"
         }`}
       >
         <Bookmark
-          className="w-4 h-4"
+          className="w-3.5 h-3.5"
           fill={scrap.on ? "currentColor" : "none"}
         />
         {scrap.count}
       </button>
-    </div>
+    </>
   );
 }

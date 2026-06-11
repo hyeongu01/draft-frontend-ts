@@ -44,6 +44,7 @@ async function Feed({ searchParams }: { searchParams: SearchParams }) {
           {resumes.map((r) => (
             <ResumeCard
               key={r.id}
+              resumeId={r.id} // 좋아요·스크랩 토글 활성화
               href={`/resumes/${r.id}`}
               title={r.title}
               description={r.description}

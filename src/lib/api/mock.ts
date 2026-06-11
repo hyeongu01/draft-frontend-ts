@@ -1,8 +1,9 @@
-// 백엔드 미구현 구간(resumes/likes/bookmarks)용 목업 데이터.
-// NEXT_PUBLIC_USE_MOCK=false 로 끄면 실제 API를 호출한다(기본 ON).
+// 백엔드 미구현 구간용 목업 데이터.
+// 현재 남은 용도: /me 보관함·좋아요 탭의 "이력서 목록" (id 목록 계약만 있고 목록 계약 부재).
+// 좋아요·스크랩 토글/상태는 실 API(생성 훅)로 전환 완료 → src/hooks/useResumeReactions.ts
 import type { Resume, User } from "@/lib/types";
 
-// 데이터(resumes/likes/bookmarks) 목업 — 기본 ON
+// swagger 미반영 영역 목업 스위치 — 기본 ON. 새 임시 계약 추가 시 재사용.
 export const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK !== "false";
 
 // 인증 목업(데모 유저) — 기본 OFF. true일 때만 백엔드 없이 /me·편집을 본다.
@@ -199,39 +200,6 @@ const RESUMES: Resume[] = [
 const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v));
 
 // ── 조회 헬퍼 ──────────────────────────────────────────────
-export function mockPublicResumes(years?: string): Resume[] {
-  const ranges: Record<string, [number, number]> = {
-    junior: [0, 2],
-    mid: [3, 5],
-    senior: [6, 100],
-  };
-  const list = RESUMES.filter((r) => r.isPublic);
-  const range = years ? ranges[years] : undefined;
-  const filtered = range
-    ? list.filter(
-        (r) => r.experienceYears >= range[0] && r.experienceYears <= range[1],
-      )
-    : list;
-  return clone(filtered);
-}
-
-export function mockResume(id: string): Resume {
-  const found = RESUMES.find((r) => r.id === id);
-  if (found) return clone(found);
-  // 새로 만든(목업) 이력서 — 빈 편집 화면용 기본값
-  return makeResume({
-    id,
-    userId: MOCK_ME_ID,
-    title: "새 이력서",
-    isPublic: false,
-    author: { nickname: "나" },
-    content: {},
-  });
-}
-
-export const mockMyResumes = (): Resume[] =>
-  clone(RESUMES.filter((r) => r.userId === MOCK_ME_ID));
-
 export const mockMyBookmarks = (): Resume[] =>
   clone(RESUMES.filter((r) => r.id === "mock-1" || r.id === "mock-2"));
 

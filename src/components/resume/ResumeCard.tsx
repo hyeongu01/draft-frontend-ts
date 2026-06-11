@@ -1,6 +1,7 @@
 // src/components/resume/ResumeCard.tsx
 import Link from "next/link";
 import { formatExperience } from "@/types/resume";
+import ResumeCardReactions from "./ResumeCardReactions";
 
 type Props = {
   href: string;
@@ -14,6 +15,9 @@ type Props = {
   viewCount?: number; // 백엔드 계약에 아직 없음 — 있을 때만 표시
   // 제공 시 공개/비공개 배지 표시 (마이페이지 전용)
   isPublic?: boolean;
+  // 제공 시 좋아요·스크랩이 토글 버튼으로 동작 (공개 피드 전용).
+  // 미제공이면 카운트만 표시 (/me 목록 등).
+  resumeId?: string;
 };
 
 export default function ResumeCard({
@@ -27,16 +31,15 @@ export default function ResumeCard({
   scrapCount,
   viewCount,
   isPublic,
+  resumeId,
 }: Props) {
   // 한 줄 설명만 — 비어있으면 표시 안 함
   const summary = description?.trim();
 
   return (
-    <Link
-      href={href}
-      prefetch={false}
-      className="block border rounded-lg p-4 hover:bg-gray-50 transition-colors"
-    >
+    // 카드 전체를 <a>로 감싸면 내부 토글 버튼이 중첩 인터랙티브(invalid HTML)가 됨.
+    // → 제목 링크의 after 오버레이로 카드 전체 클릭을 유지하고, 버튼은 z-10으로 위에 띄운다.
+    <div className="relative border rounded-lg p-4 hover:bg-gray-50 transition-colors">
       <div className="flex items-center gap-1.5 mb-2 text-xs text-gray-500">
         <span className="font-medium text-gray-700">{nickname}</span>
         {jobRole && (
@@ -59,17 +62,35 @@ export default function ResumeCard({
           </span>
         )}
       </div>
-      <h2 className="text-sm font-medium mb-1.5 leading-snug">{title}</h2>
+      <h2 className="text-sm font-medium mb-1.5 leading-snug">
+        <Link
+          href={href}
+          prefetch={false}
+          className="after:absolute after:inset-0"
+        >
+          {title}
+        </Link>
+      </h2>
       {summary && (
         <p className="text-xs text-gray-500 leading-relaxed mb-3 line-clamp-2">
           {summary}
         </p>
       )}
       <div className="flex gap-3 text-xs text-gray-400">
-        <span>♥ {likeCount}</span>
-        <span>🔖 {scrapCount}</span>
+        {resumeId ? (
+          <ResumeCardReactions
+            resumeId={resumeId}
+            likeCount={likeCount}
+            scrapCount={scrapCount}
+          />
+        ) : (
+          <>
+            <span>♥ {likeCount}</span>
+            <span>🔖 {scrapCount}</span>
+          </>
+        )}
         {viewCount !== undefined && <span>👁 {viewCount}</span>}
       </div>
-    </Link>
+    </div>
   );
 }
