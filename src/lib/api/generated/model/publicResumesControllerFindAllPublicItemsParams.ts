@@ -7,9 +7,9 @@
  * ※ category 는 일반 유저가 생성/수정/삭제할 수 없으며 조회만 가능합니다. category 관리(생성·수정·삭제)는 추후 AdminJS 기반 관리자 도구를 통해 제공될 예정입니다.
  * OpenAPI spec version: 1.0
  */
-import type { ResumesControllerFindAllOrder } from './resumesControllerFindAllOrder';
+import type { PublicResumesControllerFindAllPublicItemsOrder } from './publicResumesControllerFindAllPublicItemsOrder';
 
-export type ResumesControllerFindAllParams = {
+export type PublicResumesControllerFindAllPublicItemsParams = {
 /**
  * 현재 페이지 (1부터 시작)
  * @minimum 1
@@ -25,5 +25,11 @@ limit?: number;
  * 정렬 기준 필드
  */
 sort?: string;
-order?: ResumesControllerFindAllOrder;
+order?: PublicResumesControllerFindAllPublicItemsOrder;
+/**
+ * 카테고리 그룹 필터
+ */
+groupId?: number;
+minCareerYear?: number;
+maxCareerYear?: number;
 };

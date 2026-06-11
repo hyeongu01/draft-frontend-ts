@@ -8,10 +8,10 @@ export default function OwnerEditLink({
   ownerId,
 }: {
   resumeId: string;
-  ownerId: string;
+  ownerId?: string; // 공개 DTO에 user.id 없으면 undefined → 편집 링크 숨김
 }) {
   const { user } = useUserContext();
-  if (user?.id !== ownerId) return null;
+  if (!ownerId || user?.id !== ownerId) return null;
   return (
     <Link
       href={`/me/resumes/${resumeId}/edit`}
