@@ -38,7 +38,9 @@ async function ResumeDetail({ params }: { params: Promise<{ id: string }> }) {
         <Link href="/" prefetch={false} className="text-sm text-gray-500 hover:underline">
           ← 피드로
         </Link>
-        <OwnerEditLink resumeId={resume.id} ownerId={resume.userId} />
+        {/* 작성자 본인 판별엔 owner id 필요 — 공개 DTO(PublicUserResponseType)에 user.id 추가되면
+            ownerId={resume.user?.id} 전달. 그 전엔 미전달 → 편집 링크 숨김. */}
+        <OwnerEditLink resumeId={resume.id} />
       </div>
 
       <header className="mb-8 pb-6 border-b">
@@ -48,15 +50,15 @@ async function ResumeDetail({ params }: { params: Promise<{ id: string }> }) {
         )}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 text-sm text-gray-500">
-            <span>{resume.author?.nickname ?? "익명"}</span>
-            {resume.jobRole && (
+            <span>{resume.user?.nickname ?? "익명"}</span>
+            {resume.category?.name && (
               <>
                 <span aria-hidden>·</span>
-                <span>{resume.jobRole}</span>
+                <span>{resume.category.name}</span>
               </>
             )}
             <span aria-hidden>·</span>
-            <span>{formatExperience(resume.experienceYears)}</span>
+            <span>{formatExperience(resume.careerYears ?? 0)}</span>
           </div>
           <ResumeActions
             resumeId={resume.id}

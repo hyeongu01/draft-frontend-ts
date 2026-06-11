@@ -4,9 +4,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   useResumesControllerUpdateItem,
   useResumesControllerDeleteItem,
+  getResumesControllerFindOneQueryKey,
+  getResumesControllerFindAllQueryKey,
 } from "@/lib/api/generated/resumes-private/resumes-private";
 import { useCategories } from "@/hooks/useCategories";
 import ResumeSections from "@/components/resume/ResumeSections";
@@ -23,6 +26,7 @@ export default function EditResumeForm({
   resume: ResumeResponseType;
 }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { categories, isLoading: categoriesLoading } = useCategories();
   const updateMut = useResumesControllerUpdateItem();
   const deleteMut = useResumesControllerDeleteItem();
@@ -30,9 +34,9 @@ export default function EditResumeForm({
 
   const [title, setTitle] = useState(resume.title);
   const [description, setDescription] = useState(resume.description);
-  // 직무 = 카테고리(categoryId) 참조. 미선택은 null.
+  // 직무 = 카테고리(category) 참조. 미선택은 null.
   const [categoryId, setCategoryId] = useState<number | null>(
-    resume.categoryId ?? null,
+    resume.category?.id ?? null,
   );
   const [isPublic, setIsPublic] = useState(resume.isPublic);
   // 연차 = 백엔드 careerYears
@@ -82,6 +86,15 @@ export default function EditResumeForm({
           ...(categoryId != null ? { categoryId } : {}),
         },
       });
+      // 저장 후 캐시 무효화 — 재진입 시 저장 전 문서가 남지 않도록(staleTime 60s).
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: getResumesControllerFindOneQueryKey(resume.id),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: getResumesControllerFindAllQueryKey(),
+        }),
+      ]);
       setSaveError(null);
       setSavedAt(new Date());
     } catch {
@@ -93,6 +106,13 @@ export default function EditResumeForm({
     if (!confirm("정말 삭제할까요? 되돌릴 수 없어요.")) return;
     try {
       await deleteMut.mutateAsync({ id: resume.id });
+      // 삭제 후 목록 캐시 무효화 + 해당 단건 캐시 제거.
+      queryClient.removeQueries({
+        queryKey: getResumesControllerFindOneQueryKey(resume.id),
+      });
+      await queryClient.invalidateQueries({
+        queryKey: getResumesControllerFindAllQueryKey(),
+      });
       router.push("/me");
     } catch {
       setSaveError("삭제에 실패했어요. 다시 시도해주세요.");

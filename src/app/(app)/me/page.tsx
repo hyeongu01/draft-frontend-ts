@@ -146,7 +146,7 @@ function OwnResumesTab({ fallbackNickname }: { fallbackNickname: string }) {
           href={`/me/resumes/${r.id}/edit`}
           title={r.title}
           description={r.description}
-          jobRole={r.categoryId != null ? nameById.get(r.categoryId) ?? null : null}
+          jobRole={r.category?.id != null ? nameById.get(r.category.id) ?? null : null}
           experienceYears={r.careerYears ?? 0}
           nickname={fallbackNickname}
           likeCount={r.likeCount}

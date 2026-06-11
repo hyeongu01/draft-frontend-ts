@@ -1,7 +1,7 @@
 // src/app/(app)/page.tsx — 공개 피드 (SSR, 인증 불필요)
 import { Suspense } from "react";
 import ResumeCard from "@/components/resume/ResumeCard";
-import FilterChips from "@/components/resume/FilterChips";
+import FilterChips, { YEAR_FILTERS } from "@/components/resume/FilterChips";
 import { getPublicResumes } from "@/lib/api/public";
 
 type SearchParams = Promise<{ years?: string }>;
@@ -20,8 +20,16 @@ export default function Home({ searchParams }: { searchParams: SearchParams }) {
 async function Feed({ searchParams }: { searchParams: SearchParams }) {
   const { years = "" } = await searchParams;
 
-  // 공개 이력서 — 연차 필터는 백엔드 쿼리로 위임. 작성자 닉네임은 응답에 임베딩.
-  const resumes = await getPublicResumes(years);
+  // years 칩(키) → 백엔드 careerYears 범위 쿼리로 매핑. "전체"는 필터 미적용.
+  const filter = YEAR_FILTERS.find((y) => y.key === years) ?? YEAR_FILTERS[0];
+  const resumes = await getPublicResumes(
+    filter.key
+      ? {
+          minCareerYear: filter.min,
+          ...(filter.max != null ? { maxCareerYear: filter.max } : {}),
+        }
+      : {},
+  );
 
   return (
     <>
@@ -39,12 +47,11 @@ async function Feed({ searchParams }: { searchParams: SearchParams }) {
               href={`/resumes/${r.id}`}
               title={r.title}
               description={r.description}
-              jobRole={r.jobRole}
-              experienceYears={r.experienceYears}
-              nickname={r.author?.nickname ?? "익명"}
+              jobRole={r.category?.name ?? null}
+              experienceYears={r.careerYears ?? 0}
+              nickname={r.user?.nickname ?? "익명"}
               likeCount={r.likeCount}
               scrapCount={r.scrapCount}
-              viewCount={r.viewCount}
             />
           ))}
         </div>
