@@ -217,7 +217,7 @@ export default async function ResumePage({ params }) {
 - **Tiptap 다중 인스턴스(섹션마다 에디터)**: 하나의 ProseMirror 문서가 아니라 섹션별 별도 에디터.
 - **PDF 업로드는 v2 이후**: MVP는 자체 에디터로 통일.
 - **카카오 OAuth 안 함**: Google + GitHub만. 타겟이 IT·디자인 직군 중심.
-- **개인정보 정책**: 공개 이력서에서 본명·연락처 절대 노출 안 함. 닉네임만 표시. 식별정보 교환은 채팅에서 본인 의지로.
+- **개인정보 정책**: 공개 이력서에서 본명·연락처 절대 노출 안 함. 공개 정보는 **닉네임 + 프로필 이미지**(온보딩에서 수집, 이미지는 선택·스킵 가능). 식별정보 교환은 채팅에서 본인 의지로. (2026-06 결정: 프로필 이미지를 공개 정보로 확장)
 - **Supabase → NestJS**: RLS/Server Action 우회 위험 및 백엔드 자율성 위해 자체 NestJS로 이전. 인증은 메모리 accessToken + HttpOnly refresh.
 
 ## 자주 발생하는 함정
