@@ -47,3 +47,6 @@ export * from './usersControllerDeleteMyProfile200';
 export * from './usersControllerGetLikeResumes200';
 export * from './usersControllerGetLikeResumesOrder';
 export * from './usersControllerGetLikeResumesParams';
+export * from './usersControllerGetScrapResumes200';
+export * from './usersControllerGetScrapResumesOrder';
+export * from './usersControllerGetScrapResumesParams';

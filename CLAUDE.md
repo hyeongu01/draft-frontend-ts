@@ -86,8 +86,8 @@ src/
     │   ├── client.ts                       # apiFetch / apiJson (봉투 벗김, 401 재시도)
     │   ├── orval-fetcher.ts                # ★ orval 커스텀 mutator (apiJson 재사용)
     │   ├── generated/                       # ★ orval 자동 생성 (타입+훅) — 수동 편집 금지
-    │   ├── resumes.ts / users.ts / public.ts# swagger 미반영 영역 임시 래퍼(USE_MOCK)
-    │   └── mock.ts                         # USE_MOCK 임시 데이터
+    │   ├── users.ts / public.ts            # 생성 훅 위 얇은 래퍼 (users는 인증 부수처리)
+    │   └── mock.ts                         # 인증 목업(MOCK_AUTH)만 잔존 — 데이터 mock은 전부 실연동으로 제거됨
     ├── auth/token.ts                       # accessToken 메모리 보관
     ├── types.ts / src/types/               # 도메인 타입 (swagger와 일치 유지)
     └── utils.ts

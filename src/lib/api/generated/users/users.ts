@@ -32,7 +32,9 @@ import type {
   UserResponseType,
   UsersControllerDeleteMyProfile200,
   UsersControllerGetLikeResumes200,
-  UsersControllerGetLikeResumesParams
+  UsersControllerGetLikeResumesParams,
+  UsersControllerGetScrapResumes200,
+  UsersControllerGetScrapResumesParams
 } from '../model';
 
 import { customFetch } from '../../orval-fetcher';
@@ -515,6 +517,100 @@ export function useUsersControllerGetLikeResumes<TData = Awaited<ReturnType<type
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getUsersControllerGetLikeResumesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+/**
+ * 현재 로그인한 유저가 스크랩한 이력서 목록을 페이지네이션으로 반환합니다. 공개(isPublic=true) 상태인 이력서만 포함되며, 스크랩 이후 비공개로 전환되거나 삭제된 이력서는 목록에서 제외됩니다. page/limit/sort/order 쿼리 파라미터로 페이지와 정렬을 제어하고, 스크랩한 이력서가 없으면 빈 배열을 반환합니다.
+ * @summary user's scraps resumes
+ */
+export const usersControllerGetScrapResumes = (
+    params?: UsersControllerGetScrapResumesParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customFetch<UsersControllerGetScrapResumes200>(
+      {url: `/users/me/scraps/resumes`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getUsersControllerGetScrapResumesQueryKey = (params?: UsersControllerGetScrapResumesParams,) => {
+    return [
+    `/users/me/scraps/resumes`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getUsersControllerGetScrapResumesQueryOptions = <TData = Awaited<ReturnType<typeof usersControllerGetScrapResumes>>, TError = ErrorType<void>>(params?: UsersControllerGetScrapResumesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetScrapResumes>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getUsersControllerGetScrapResumesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersControllerGetScrapResumes>>> = ({ signal }) => usersControllerGetScrapResumes(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetScrapResumes>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type UsersControllerGetScrapResumesQueryResult = NonNullable<Awaited<ReturnType<typeof usersControllerGetScrapResumes>>>
+export type UsersControllerGetScrapResumesQueryError = ErrorType<void>
+
+
+export function useUsersControllerGetScrapResumes<TData = Awaited<ReturnType<typeof usersControllerGetScrapResumes>>, TError = ErrorType<void>>(
+ params: undefined |  UsersControllerGetScrapResumesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetScrapResumes>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof usersControllerGetScrapResumes>>,
+          TError,
+          Awaited<ReturnType<typeof usersControllerGetScrapResumes>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useUsersControllerGetScrapResumes<TData = Awaited<ReturnType<typeof usersControllerGetScrapResumes>>, TError = ErrorType<void>>(
+ params?: UsersControllerGetScrapResumesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetScrapResumes>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof usersControllerGetScrapResumes>>,
+          TError,
+          Awaited<ReturnType<typeof usersControllerGetScrapResumes>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useUsersControllerGetScrapResumes<TData = Awaited<ReturnType<typeof usersControllerGetScrapResumes>>, TError = ErrorType<void>>(
+ params?: UsersControllerGetScrapResumesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetScrapResumes>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary user's scraps resumes
+ */
+
+export function useUsersControllerGetScrapResumes<TData = Awaited<ReturnType<typeof usersControllerGetScrapResumes>>, TError = ErrorType<void>>(
+ params?: UsersControllerGetScrapResumesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetScrapResumes>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getUsersControllerGetScrapResumesQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

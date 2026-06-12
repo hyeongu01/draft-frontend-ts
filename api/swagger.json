@@ -390,6 +390,115 @@
                                                                        ]
                                                           }
                                               },
+                  "/users/me/scraps/resumes":  {
+                                                   "get":  {
+                                                               "description":  "현재 로그인한 유저가 스크랩한 이력서 목록을 페이지네이션으로 반환합니다. 공개(isPublic=true) 상태인 이력서만 포함되며, 스크랩 이후 비공개로 전환되거나 삭제된 이력서는 목록에서 제외됩니다. page/limit/sort/order 쿼리 파라미터로 페이지와 정렬을 제어하고, 스크랩한 이력서가 없으면 빈 배열을 반환합니다.",
+                                                               "operationId":  "UsersController_getScrapResumes",
+                                                               "parameters":  [
+                                                                                  {
+                                                                                      "name":  "page",
+                                                                                      "required":  false,
+                                                                                      "in":  "query",
+                                                                                      "description":  "현재 페이지 (1부터 시작)",
+                                                                                      "schema":  {
+                                                                                                     "minimum":  1,
+                                                                                                     "default":  1,
+                                                                                                     "type":  "number"
+                                                                                                 }
+                                                                                  },
+                                                                                  {
+                                                                                      "name":  "limit",
+                                                                                      "required":  false,
+                                                                                      "in":  "query",
+                                                                                      "description":  "페이지당 아이템 수",
+                                                                                      "schema":  {
+                                                                                                     "minimum":  1,
+                                                                                                     "maximum":  100,
+                                                                                                     "default":  10,
+                                                                                                     "type":  "number"
+                                                                                                 }
+                                                                                  },
+                                                                                  {
+                                                                                      "name":  "sort",
+                                                                                      "required":  false,
+                                                                                      "in":  "query",
+                                                                                      "description":  "정렬 기준 필드",
+                                                                                      "schema":  {
+                                                                                                     "default":  "createdAt",
+                                                                                                     "type":  "string"
+                                                                                                 }
+                                                                                  },
+                                                                                  {
+                                                                                      "name":  "order",
+                                                                                      "required":  false,
+                                                                                      "in":  "query",
+                                                                                      "schema":  {
+                                                                                                     "default":  "desc",
+                                                                                                     "type":  "string",
+                                                                                                     "enum":  [
+                                                                                                                  "asc",
+                                                                                                                  "desc"
+                                                                                                              ]
+                                                                                                 }
+                                                                                  }
+                                                                              ],
+                                                               "responses":  {
+                                                                                 "200":  {
+                                                                                             "description":  "",
+                                                                                             "content":  {
+                                                                                                             "application/json":  {
+                                                                                                                                      "schema":  {
+                                                                                                                                                     "allOf":  [
+                                                                                                                                                                   {
+                                                                                                                                                                       "$ref":  "#/components/schemas/ResponsePaginatedSuccess"
+                                                                                                                                                                   },
+                                                                                                                                                                   {
+                                                                                                                                                                       "properties":  {
+                                                                                                                                                                                          "data":  {
+                                                                                                                                                                                                       "type":  "object",
+                                                                                                                                                                                                       "properties":  {
+                                                                                                                                                                                                                          "items":  {
+                                                                                                                                                                                                                                        "type":  "array",
+                                                                                                                                                                                                                                        "items":  {
+                                                                                                                                                                                                                                                      "$ref":  "#/components/schemas/ResumeResponseType"
+                                                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                                    },
+                                                                                                                                                                                                                          "metadata":  {
+                                                                                                                                                                                                                                           "$ref":  "#/components/schemas/PaginationMetadataType"
+                                                                                                                                                                                                                                       }
+                                                                                                                                                                                                                      },
+                                                                                                                                                                                                       "required":  [
+                                                                                                                                                                                                                        "items",
+                                                                                                                                                                                                                        "metadata"
+                                                                                                                                                                                                                    ]
+                                                                                                                                                                                                   }
+                                                                                                                                                                                      },
+                                                                                                                                                                       "required":  [
+                                                                                                                                                                                        "data"
+                                                                                                                                                                                    ]
+                                                                                                                                                                   }
+                                                                                                                                                               ]
+                                                                                                                                                 }
+                                                                                                                                  }
+                                                                                                         }
+                                                                                         },
+                                                                                 "500":  {
+                                                                                             "description":  "Internal Server Error"
+                                                                                         }
+                                                                             },
+                                                               "security":  [
+                                                                                {
+                                                                                    "bearer":  [
+
+                                                                                               ]
+                                                                                }
+                                                                            ],
+                                                               "summary":  "user\u0027s scraps resumes",
+                                                               "tags":  [
+                                                                            "Users"
+                                                                        ]
+                                                           }
+                                               },
                   "/auth/google/login":  {
                                              "get":  {
                                                          "description":  "device_id HttpOnly 쿠키를 설정하고 구글 OAuth 동의 화면으로 302 리다이렉트 합니다.",

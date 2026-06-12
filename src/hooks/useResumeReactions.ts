@@ -19,6 +19,7 @@ import {
   getUsersControllerGetLikeIdsQueryKey,
   getUsersControllerGetScrapIdsQueryKey,
   getUsersControllerGetLikeResumesQueryKey,
+  getUsersControllerGetScrapResumesQueryKey,
 } from "@/lib/api/generated/users/users";
 import {
   useResumeReactionsControllerToggleLike,
@@ -123,6 +124,11 @@ export function useResumeReactions(
       onSuccess: (data) => {
         setScrapCount(data.scrapCount);
         setIds(scrapIdsKey, data.isScrapped ? withId : withoutId);
+        // /me 보관함 탭 목록(GET /users/me/scraps/resumes)도 재동기화
+        // (키 prefix 매칭 — 탭에서 해제하면 목록에서 빠진다)
+        queryClient.invalidateQueries({
+          queryKey: getUsersControllerGetScrapResumesQueryKey(),
+        });
       },
     },
   });

@@ -1,6 +1,6 @@
 "use client";
 // 마이페이지 — CSR. 인증 필요 (토큰은 메모리, 서버에서 못 읽으므로 클라이언트 fetch).
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import ResumeCard from "@/components/resume/ResumeCard";
@@ -8,14 +8,18 @@ import UserAvatar from "@/components/UserAvatar";
 import EditProfileDialog from "@/components/profile/EditProfileDialog";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useUserContext } from "@/context/AuthContext";
-import { getMyBookmarks } from "@/lib/api/resumes";
 import { useResumesControllerFindAll } from "@/lib/api/generated/resumes-private/resumes-private";
 import {
   usersControllerGetLikeResumes,
   getUsersControllerGetLikeResumesQueryKey,
+  usersControllerGetScrapResumes,
+  getUsersControllerGetScrapResumesQueryKey,
 } from "@/lib/api/generated/users/users";
 import { useCategories } from "@/hooks/useCategories";
-import type { Resume } from "@/lib/types";
+import type {
+  PaginationMetadataType,
+  ResumeResponseType,
+} from "@/lib/api/generated/model";
 
 type Tab = "resumes" | "saved" | "liked";
 
@@ -131,7 +135,7 @@ function TabContent({
   fallbackNickname: string;
   fallbackProfileImageUrl: string | null;
 }) {
-  // "내 이력서"(GET /me/resumes)·"좋아요"(GET /users/me/likes/resumes)는 실 엔드포인트, saved는 아직 mock.
+  // 내 이력서=GET /me/resumes, 좋아요=GET /users/me/likes/resumes, 보관함=GET /users/me/scraps/resumes — 전부 실 엔드포인트.
   if (tab === "resumes")
     return (
       <OwnResumesTab
@@ -139,8 +143,27 @@ function TabContent({
         fallbackProfileImageUrl={fallbackProfileImageUrl}
       />
     );
-  if (tab === "liked") return <LikedTab />;
-  return <SavedTab />;
+  if (tab === "liked")
+    return (
+      <ReactionListTab
+        queryKey={getUsersControllerGetLikeResumesQueryKey({
+          limit: REACTION_PAGE_LIMIT,
+        })}
+        queryFn={usersControllerGetLikeResumes}
+        emptyTitle="좋아요한 이력서가 없어요"
+        emptySub="피드에서 ♥로 표현해보세요"
+      />
+    );
+  return (
+    <ReactionListTab
+      queryKey={getUsersControllerGetScrapResumesQueryKey({
+        limit: REACTION_PAGE_LIMIT,
+      })}
+      queryFn={usersControllerGetScrapResumes}
+      emptyTitle="보관한 이력서가 없어요"
+      emptySub="피드에서 🔖로 보관해보세요"
+    />
+  );
 }
 
 // 내 이력서 — GET /me/resumes (소유자 전용). 직무는 categoryId→이름 룩업.
@@ -189,13 +212,32 @@ function OwnResumesTab({
   );
 }
 
-// 좋아요 — GET /users/me/likes/resumes (페이지네이션, 공개 피드와 동일 응답 구조).
+// 좋아요·보관함 — GET /users/me/likes|scraps/resumes (페이지네이션, 응답 구조 완전 동일).
+// fetcher·쿼리키·빈 상태 문구만 props로 받는 공용 탭.
 // "더 보기" append + 토글 후 invalidate 시 로드된 전 페이지 재동기화(목록에서 제거)가
 // 둘 다 필요해 useInfiniteQuery 사용. queryFn·queryKey는 orval 생성물 재사용 →
 // 인증·봉투 처리는 생성 훅과 동일.
-const LIKED_PAGE_LIMIT = 20;
+const REACTION_PAGE_LIMIT = 20;
 
-function LikedTab() {
+type ReactionPage = {
+  items: ResumeResponseType[];
+  metadata: PaginationMetadataType;
+};
+
+function ReactionListTab({
+  queryKey,
+  queryFn,
+  emptyTitle,
+  emptySub,
+}: {
+  queryKey: readonly unknown[];
+  queryFn: (
+    params: { page?: number; limit?: number },
+    signal?: AbortSignal,
+  ) => Promise<ReactionPage>;
+  emptyTitle: string;
+  emptySub: string;
+}) {
   const {
     data,
     isLoading,
@@ -204,14 +246,9 @@ function LikedTab() {
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: getUsersControllerGetLikeResumesQueryKey({
-      limit: LIKED_PAGE_LIMIT,
-    }),
+    queryKey,
     queryFn: ({ pageParam, signal }) =>
-      usersControllerGetLikeResumes(
-        { page: pageParam, limit: LIKED_PAGE_LIMIT },
-        signal,
-      ),
+      queryFn({ page: pageParam, limit: REACTION_PAGE_LIMIT }, signal),
     initialPageParam: 1,
     getNextPageParam: (last) =>
       last.metadata.page * last.metadata.limit < last.metadata.total
@@ -222,10 +259,7 @@ function LikedTab() {
   if (isLoading) return <ListSkeleton />;
 
   const items = data?.pages.flatMap((p) => p.items) ?? [];
-  if (isError || !items.length)
-    return (
-      <Empty title="좋아요한 이력서가 없어요" sub="피드에서 ♥로 표현해보세요" />
-    );
+  if (isError || !items.length) return <Empty title={emptyTitle} sub={emptySub} />;
 
   return (
     <>
@@ -258,50 +292,6 @@ function LikedTab() {
         </div>
       )}
     </>
-  );
-}
-
-// 보관함 — 계약 미정, mock 유지.
-// TODO: GET /users/me/scraps/resumes 추가되면 LikedTab과 동일하게 실연동
-function SavedTab() {
-  const [resumes, setResumes] = useState<Resume[] | null>(null);
-
-  useEffect(() => {
-    let alive = true;
-    setResumes(null);
-    getMyBookmarks()
-      .then((data) => alive && setResumes(data))
-      .catch(() => alive && setResumes([]));
-    return () => {
-      alive = false;
-    };
-  }, []);
-
-  if (resumes === null) return <ListSkeleton />;
-
-  if (!resumes.length)
-    return (
-      <Empty title="보관한 이력서가 없어요" sub="피드에서 🔖로 보관해보세요" />
-    );
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      {resumes.map((r) => (
-        <ResumeCard
-          key={r.id}
-          href={`/resumes/${r.id}`}
-          title={r.title}
-          description={r.description}
-          jobRole={r.jobRole}
-          experienceYears={r.experienceYears}
-          nickname={r.author?.nickname ?? "익명"}
-          profileImageUrl={r.author?.profileImageUrl}
-          likeCount={r.likeCount}
-          scrapCount={r.scrapCount}
-          viewCount={r.viewCount}
-        />
-      ))}
-    </div>
   );
 }
 
