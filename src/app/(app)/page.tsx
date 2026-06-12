@@ -51,6 +51,7 @@ async function Feed({ searchParams }: { searchParams: SearchParams }) {
               jobRole={r.category?.name ?? null}
               experienceYears={r.careerYears ?? 0}
               nickname={r.user?.nickname ?? "익명"}
+              profileImageUrl={r.user?.profileImageUrl}
               likeCount={r.likeCount}
               scrapCount={r.scrapCount}
             />

@@ -16,7 +16,8 @@ interface UserContextType {
   user: User | null; // 인증된 유저 (토큰 유효 시 존재)
   profile: User | null; // 닉네임까지 설정된 경우에만 non-null (온보딩 분기용)
   isLoading: boolean;
-  refreshProfile: () => Promise<User | null>; // 토큰 유지, /users/me 만 재조회 (온보딩 후 등)
+  refreshProfile: () => Promise<User | null>; // 토큰 유지, /users/me 만 재조회 (폴백용)
+  setUser: (user: User) => void; // mutation 응답(PUT /users/me 등)의 유저로 직접 갱신 — 재조회 왕복 생략
   setSession: (token: string, user: User) => void; // OAuth 콜백: 교환 응답의 토큰+유저 주입
   logout: () => Promise<void>;
 }
@@ -88,6 +89,7 @@ export function UserProvider({
         profile,
         isLoading,
         refreshProfile: hydrate,
+        setUser,
         setSession,
         logout: apiLogout,
       }}

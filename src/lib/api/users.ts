@@ -5,12 +5,15 @@ import {
   usersControllerUpdateMyProfile,
 } from "@/lib/api/generated/users/users";
 import { authControllerLogout } from "@/lib/api/generated/auth/auth";
+import type { UpdateUserDto } from "@/lib/api/generated/model";
 import { clearAccessToken } from "@/lib/auth/token";
 
 export const getMe = () => usersControllerGetMyProfile();
 
-export const updateMe = (nickname: string) =>
-  usersControllerUpdateMyProfile({ nickname });
+// PUT /users/me — 응답은 갱신된 UserResponseType 전체.
+// profileImageUrl: temp 업로드 URL 전달 시 영구 경로로 이동, null이면 기본 이미지로 복원.
+export const updateMe = (dto: UpdateUserDto) =>
+  usersControllerUpdateMyProfile(dto);
 
 export async function logout() {
   try {

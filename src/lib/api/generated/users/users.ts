@@ -30,8 +30,7 @@ import type {
   IdsResponseType,
   UpdateUserDto,
   UserResponseType,
-  UsersControllerDeleteMyProfile200,
-  UsersControllerUpdateMyProfile200
+  UsersControllerDeleteMyProfile200
 } from '../model';
 
 import { customFetch } from '../../orval-fetcher';
@@ -126,13 +125,17 @@ export function useUsersControllerGetMyProfile<TData = Awaited<ReturnType<typeof
 
 
 
+/**
+ * 현재 로그인한 유저의 프로필을 수정합니다. 전달한 필드만 부분 수정됩니다. nickname: 2~100자. profileImageUrl: 파일 업로드 API(POST /files/profile-image/upload)가 반환한 임시(temp) URL을 전달하면 영구 경로("{R2 공개 URL}/profiles/{userId}/...")로 이동되어 저장되며, 응답에는 이동된 최종 URL이 담깁니다. null을 전달하면 프로필 이미지가 해제됩니다. 이미지 변경/해제 시 이전 이미지는 R2에서 삭제됩니다.
+ * @summary update user
+ */
 export const usersControllerUpdateMyProfile = (
     updateUserDto: BodyType<UpdateUserDto>,
  signal?: AbortSignal
 ) => {
 
 
-      return customFetch<UsersControllerUpdateMyProfile200>(
+      return customFetch<UserResponseType>(
       {url: `/users/me`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: updateUserDto, signal
@@ -173,7 +176,10 @@ const {mutation: mutationOptions} = options ?
     export type UsersControllerUpdateMyProfileMutationBody = BodyType<UpdateUserDto>
     export type UsersControllerUpdateMyProfileMutationError = ErrorType<void>
 
-    export const useUsersControllerUpdateMyProfile = <TError = ErrorType<void>,
+    /**
+ * @summary update user
+ */
+export const useUsersControllerUpdateMyProfile = <TError = ErrorType<void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersControllerUpdateMyProfile>>, TError,{data: BodyType<UpdateUserDto>}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof usersControllerUpdateMyProfile>>,

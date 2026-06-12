@@ -10,4 +10,6 @@
 
 export interface PublicUserResponseType {
   nickname: string;
+  /** @nullable */
+  profileImageUrl: string | null;
 }

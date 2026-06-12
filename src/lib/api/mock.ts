@@ -44,6 +44,7 @@ export const MOCK_USER: User = {
   nickname: "데모유저",
   name: "데모",
   email: "demo@example.com",
+  profileImageUrl: null,
   createdAt: { ISOFormat: "2026-01-01T00:00:00.000Z", timeAgo: "오래 전" },
   updatedAt: { ISOFormat: "2026-01-01T00:00:00.000Z", timeAgo: "오래 전" },
 };

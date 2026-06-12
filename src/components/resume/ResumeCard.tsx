@@ -1,6 +1,7 @@
 // src/components/resume/ResumeCard.tsx
 import Link from "next/link";
 import { formatExperience } from "@/types/resume";
+import UserAvatar from "@/components/UserAvatar";
 import ResumeCardReactions from "./ResumeCardReactions";
 
 type Props = {
@@ -10,6 +11,7 @@ type Props = {
   jobRole?: string | null;
   experienceYears: number;
   nickname: string;
+  profileImageUrl?: string | null; // 작성자 아바타 (없으면 이니셜 폴백)
   likeCount: number;
   scrapCount: number;
   viewCount?: number; // 백엔드 계약에 아직 없음 — 있을 때만 표시
@@ -27,6 +29,7 @@ export default function ResumeCard({
   jobRole,
   experienceYears,
   nickname,
+  profileImageUrl,
   likeCount,
   scrapCount,
   viewCount,
@@ -41,6 +44,11 @@ export default function ResumeCard({
     // → 제목 링크의 after 오버레이로 카드 전체 클릭을 유지하고, 버튼은 z-10으로 위에 띄운다.
     <div className="relative border rounded-lg p-4 hover:bg-gray-50 transition-colors">
       <div className="flex items-center gap-1.5 mb-2 text-xs text-gray-500">
+        <UserAvatar
+          src={profileImageUrl}
+          nickname={nickname}
+          className="w-5 h-5 text-[10px]"
+        />
         <span className="font-medium text-gray-700">{nickname}</span>
         {jobRole && (
           <>

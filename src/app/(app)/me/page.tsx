@@ -4,6 +4,8 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import ResumeCard from "@/components/resume/ResumeCard";
+import UserAvatar from "@/components/UserAvatar";
+import EditProfileDialog from "@/components/profile/EditProfileDialog";
 import { useUserContext } from "@/context/AuthContext";
 import { getMyBookmarks, getMyLikes } from "@/lib/api/resumes";
 import { useResumesControllerFindAll } from "@/lib/api/generated/resumes-private/resumes-private";
@@ -56,16 +58,20 @@ function MeContent() {
   }
 
   const nickname = profile?.nickname ?? "사용자";
-  const initial = nickname[0]?.toUpperCase() ?? "U";
 
   return (
     <div className="max-w-3xl mx-auto p-6">
       <div className="flex items-center gap-4 mb-6">
-        <div className="w-14 h-14 rounded-full bg-gray-100 text-gray-600 text-xl font-semibold flex items-center justify-center">
-          {initial}
-        </div>
+        <UserAvatar
+          src={profile?.profileImageUrl}
+          nickname={nickname}
+          className="w-14 h-14 text-xl"
+        />
         <div className="flex-1">
-          <div className="text-lg font-medium">{nickname}</div>
+          <div className="flex items-center gap-2">
+            <div className="text-lg font-medium">{nickname}</div>
+            <EditProfileDialog />
+          </div>
         </div>
         <button
           onClick={() => logout()}
@@ -102,7 +108,11 @@ function MeContent() {
         })}
       </nav>
 
-      <TabContent tab={active} fallbackNickname={nickname} />
+      <TabContent
+        tab={active}
+        fallbackNickname={nickname}
+        fallbackProfileImageUrl={profile?.profileImageUrl ?? null}
+      />
     </div>
   );
 }
@@ -110,18 +120,31 @@ function MeContent() {
 function TabContent({
   tab,
   fallbackNickname,
+  fallbackProfileImageUrl,
 }: {
   tab: Tab;
   fallbackNickname: string;
+  fallbackProfileImageUrl: string | null;
 }) {
   // "내 이력서"는 실 엔드포인트(GET /me/resumes), saved/liked는 아직 mock.
   if (tab === "resumes")
-    return <OwnResumesTab fallbackNickname={fallbackNickname} />;
+    return (
+      <OwnResumesTab
+        fallbackNickname={fallbackNickname}
+        fallbackProfileImageUrl={fallbackProfileImageUrl}
+      />
+    );
   return <MockListTab tab={tab} />;
 }
 
 // 내 이력서 — GET /me/resumes (소유자 전용). 직무는 categoryId→이름 룩업.
-function OwnResumesTab({ fallbackNickname }: { fallbackNickname: string }) {
+function OwnResumesTab({
+  fallbackNickname,
+  fallbackProfileImageUrl,
+}: {
+  fallbackNickname: string;
+  fallbackProfileImageUrl: string | null;
+}) {
   const { data, isLoading, isError } = useResumesControllerFindAll({
     limit: 50,
   });
@@ -149,6 +172,7 @@ function OwnResumesTab({ fallbackNickname }: { fallbackNickname: string }) {
           jobRole={r.category?.id != null ? nameById.get(r.category.id) ?? null : null}
           experienceYears={r.careerYears ?? 0}
           nickname={fallbackNickname}
+          profileImageUrl={fallbackProfileImageUrl}
           likeCount={r.likeCount}
           scrapCount={r.scrapCount}
           isPublic={r.isPublic}
@@ -195,6 +219,7 @@ function MockListTab({ tab }: { tab: "saved" | "liked" }) {
           jobRole={r.jobRole}
           experienceYears={r.experienceYears}
           nickname={r.author?.nickname ?? "익명"}
+          profileImageUrl={r.author?.profileImageUrl}
           likeCount={r.likeCount}
           scrapCount={r.scrapCount}
           viewCount={r.viewCount}

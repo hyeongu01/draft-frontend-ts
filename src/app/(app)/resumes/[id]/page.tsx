@@ -7,6 +7,7 @@ import { normalizeContent, formatExperience } from "@/types/resume";
 import { sectionBodyToHtml } from "@/lib/resume-html";
 import ResumeActions from "@/components/resume/ResumeActions";
 import OwnerEditLink from "@/components/resume/OwnerEditLink";
+import UserAvatar from "@/components/UserAvatar";
 
 export default function ResumeDetailPage({
   params,
@@ -50,7 +51,14 @@ async function ResumeDetail({ params }: { params: Promise<{ id: string }> }) {
         )}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 text-sm text-gray-500">
-            <span>{resume.user?.nickname ?? "익명"}</span>
+            <span className="flex items-center gap-1.5">
+              <UserAvatar
+                src={resume.user?.profileImageUrl}
+                nickname={resume.user?.nickname}
+                className="w-6 h-6 text-[11px]"
+              />
+              {resume.user?.nickname ?? "익명"}
+            </span>
             {resume.category?.name && (
               <>
                 <span aria-hidden>·</span>

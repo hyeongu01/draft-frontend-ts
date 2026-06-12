@@ -1,4 +1,5 @@
 "use client";
+import ProfileImagePicker from "@/components/profile/ProfileImagePicker";
 import { useUserContext } from "@/context/AuthContext";
 import { updateMe } from "@/lib/api/users";
 import { useRouter } from "next/navigation";
@@ -7,7 +8,10 @@ import { type JSX, useEffect, useState } from "react";
 export default function OnboardingPage(): JSX.Element {
   const [nickname, setNickname] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const { user, profile, isLoading, refreshProfile } = useUserContext();
+  // 업로드 성공 시 temp URL — 제출 시 PUT /users/me 의 profileImageUrl 로 전달
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const { user, profile, isLoading, setUser } = useUserContext();
   const router = useRouter();
 
   useEffect(() => {
@@ -19,11 +23,16 @@ export default function OnboardingPage(): JSX.Element {
   if (isLoading || !user || profile) return <>로딩중</>;
 
   const handleClick = async () => {
-    if (isSubmitting) return;
+    if (isSubmitting || isUploading) return;
     setIsSubmitting(true);
     try {
-      await updateMe(nickname);
-      await refreshProfile();
+      // 이미지는 선택사항 — 안 올렸으면 profileImageUrl 필드 자체를 생략.
+      const updated = await updateMe({
+        nickname,
+        ...(imageUrl ? { profileImageUrl: imageUrl } : {}),
+      });
+      // PUT 응답이 갱신된 유저 전체 → 재조회 없이 컨텍스트 직접 갱신.
+      setUser(updated);
       setIsSubmitting(false);
       router.replace("/");
     } catch {
@@ -53,15 +62,12 @@ export default function OnboardingPage(): JSX.Element {
             </p>
           </div>
 
-          {/* Avatar */}
-          <div className="relative w-20 h-20">
-            <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-3xl">
-              👤
-            </div>
-            <button className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-gray-800 flex items-center justify-center text-xs text-white border-2 border-white">
-              📷
-            </button>
-          </div>
+          {/* Avatar (선택 — 클릭해서 업로드, 스킵 가능) */}
+          <ProfileImagePicker
+            imageUrl={imageUrl}
+            onUploaded={setImageUrl}
+            onUploadingChange={setIsUploading}
+          />
 
           {/* Nickname Field */}
           <div className="flex flex-col gap-1.5 w-full">
@@ -85,14 +91,14 @@ export default function OnboardingPage(): JSX.Element {
           <button
             className="w-full py-3 rounded-lg bg-gray-900 hover:bg-gray-800 text-sm font-medium text-white transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             onClick={handleClick}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isUploading}
           >
             {isSubmitting ? "처리 중..." : "Drafted 시작하기"}
           </button>
 
           {/* Footer note */}
           <p className="text-xs text-gray-400 text-center">
-            닉네임은 마이페이지에서 언제든 변경할 수 있어요.
+            닉네임과 프로필 이미지는 마이페이지에서 언제든 변경할 수 있어요.
           </p>
         </div>
       </div>

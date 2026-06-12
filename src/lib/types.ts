@@ -7,6 +7,7 @@ export type User = UserResponseType;
 export type ResumeAuthor = {
   id?: string;
   nickname: string | null;
+  profileImageUrl?: string | null; // 공개 작성자 정보 (PublicUserResponseType과 동일)
 };
 
 export type Resume = {

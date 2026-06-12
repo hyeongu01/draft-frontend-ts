@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUserContext } from "@/context/AuthContext";
+import UserAvatar from "@/components/UserAvatar";
 
 const TABS: { label: string; href: string; soon?: boolean }[] = [
   { label: "홈", href: "/" },
@@ -14,7 +15,6 @@ const TABS: { label: string; href: string; soon?: boolean }[] = [
 export default function AppHeader() {
   const pathname = usePathname();
   const { profile } = useUserContext();
-  const initial = profile?.nickname?.[0]?.toUpperCase() ?? "U";
 
   return (
     <header className="sticky top-0 z-20 bg-white/90 backdrop-blur border-b">
@@ -64,9 +64,13 @@ export default function AppHeader() {
             href="/me"
             prefetch={false}
             aria-label="마이페이지"
-            className="w-7 h-7 rounded-full bg-gray-100 text-gray-600 text-xs font-semibold flex items-center justify-center hover:bg-gray-200"
+            className="block rounded-full hover:opacity-80 transition-opacity"
           >
-            {initial}
+            <UserAvatar
+              src={profile?.profileImageUrl}
+              nickname={profile?.nickname}
+              className="w-7 h-7 text-xs"
+            />
           </Link>
         </div>
       </div>

@@ -8,4 +8,7 @@
  * OpenAPI spec version: 1.0
  */
 
-export type UsersControllerUpdateMyProfile200 = { [key: string]: unknown };
+export type FilesControllerUploadFileBody = {
+  /** 프로필 이미지 (jpeg/png/webp/gif/avif, 최대 5MB) */
+  file: Blob;
+};

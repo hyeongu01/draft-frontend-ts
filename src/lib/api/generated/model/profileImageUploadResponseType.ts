@@ -7,16 +7,7 @@
  * ※ category 는 일반 유저가 생성/수정/삭제할 수 없으며 조회만 가능합니다. category 관리(생성·수정·삭제)는 추후 AdminJS 기반 관리자 도구를 통해 제공될 예정입니다.
  * OpenAPI spec version: 1.0
  */
-import type { DateFormatObject } from './dateFormatObject';
 
-export interface UserResponseType {
-  id: string;
-  /** @nullable */
-  nickname: string | null;
-  name: string;
-  email: string;
-  createdAt: DateFormatObject;
-  updatedAt: DateFormatObject;
-  /** @nullable */
-  profileImageUrl: string | null;
+export interface ProfileImageUploadResponseType {
+  profileImageUrl: string;
 }

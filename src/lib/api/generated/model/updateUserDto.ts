@@ -9,5 +9,10 @@
  */
 
 export interface UpdateUserDto {
-  nickname: string;
+  nickname?: string;
+  /**
+     * null 으로 주입하면 기존의 프로필 삭제하고 기본 프로필 이미지로 변경함
+     * @nullable
+     */
+  profileImageUrl?: string | null;
 }

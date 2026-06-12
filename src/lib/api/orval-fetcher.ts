@@ -31,10 +31,23 @@ function withQuery(url: string, params?: Record<string, unknown>): string {
 // Orval이 호출하는 단일 진입점. apiJson이 봉투를 벗기므로 T는 .data 타입.
 export const customFetch = <T>(config: OrvalRequestConfig): Promise<T> => {
   const { url, method, params, data, headers, signal } = config;
+  // FormData(파일 업로드)는 stringify 금지. Content-Type도 제거해야
+  // 브라우저가 multipart boundary를 포함한 헤더를 직접 설정한다.
+  const isFormData = typeof FormData !== "undefined" && data instanceof FormData;
+  const finalHeaders =
+    isFormData && headers
+      ? Object.fromEntries(
+          Object.entries(headers).filter(
+            ([key]) => key.toLowerCase() !== "content-type",
+          ),
+        )
+      : headers;
   return apiJson<T>(withQuery(url, params), {
     method: method.toUpperCase(),
-    ...(data !== undefined ? { body: JSON.stringify(data) } : {}),
-    ...(headers ? { headers } : {}),
+    ...(data !== undefined
+      ? { body: data instanceof FormData ? data : JSON.stringify(data) }
+      : {}),
+    ...(finalHeaders ? { headers: finalHeaders } : {}),
     ...(signal ? { signal } : {}),
   });
 };

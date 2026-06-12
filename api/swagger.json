@@ -74,6 +74,7 @@
                                                          ]
                                             },
                                     "put":  {
+                                                "description":  "현재 로그인한 유저의 프로필을 수정합니다. 전달한 필드만 부분 수정됩니다. nickname: 2~100자. profileImageUrl: 파일 업로드 API(POST /files/profile-image/upload)가 반환한 임시(temp) URL을 전달하면 영구 경로(\"{R2 공개 URL}/profiles/{userId}/...\")로 이동되어 저장되며, 응답에는 이동된 최종 URL이 담깁니다. null을 전달하면 프로필 이미지가 해제됩니다. 이미지 변경/해제 시 이전 이미지는 R2에서 삭제됩니다.",
                                                 "operationId":  "UsersController_updateMyProfile",
                                                 "parameters":  [
 
@@ -101,11 +102,7 @@
                                                                                                                                                     {
                                                                                                                                                         "properties":  {
                                                                                                                                                                            "data":  {
-                                                                                                                                                                                        "type":  "object",
-                                                                                                                                                                                        "additionalProperties":  false,
-                                                                                                                                                                                        "example":  {
-
-                                                                                                                                                                                                    }
+                                                                                                                                                                                        "$ref":  "#/components/schemas/UserResponseType"
                                                                                                                                                                                     }
                                                                                                                                                                        },
                                                                                                                                                         "required":  [
@@ -116,6 +113,9 @@
                                                                                                                                   }
                                                                                                                    }
                                                                                           }
+                                                                          },
+                                                                  "400":  {
+                                                                              "description":  "profileImageUrl이 유효하지 않은 경우 — 버킷 외부 URL이거나, temp URL이 아니거나, 임시 파일이 만료/삭제되어 존재하지 않는 경우(다시 업로드 필요)"
                                                                           },
                                                                   "500":  {
                                                                               "description":  "Internal Server Error"
@@ -128,6 +128,7 @@
                                                                                 ]
                                                                  }
                                                              ],
+                                                "summary":  "update user",
                                                 "tags":  [
                                                              "Users"
                                                          ]
@@ -1164,7 +1165,73 @@
                                                                    "Categories"
                                                                ]
                                                   }
-                                      }
+                                      },
+                  "/files/profile-image/upload":  {
+                                                      "post":  {
+                                                                   "description":  "프로필 이미지를 512x512 webp로 리사이즈하여 임시(temp) 경로에 업로드하고 임시 공개 URL을 반환합니다. URL 형식: \"{R2 공개 URL}/temp/{ulid}/512x512.webp\" (업로드마다 ulid가 새로 생성됨). 이 URL을 PUT /users/me의 profileImageUrl로 전달해야 영구 경로로 이동되어 프로필에 반영됩니다. 허용 형식: jpeg/png/webp/gif/avif, 최대 5MB. 추후 필요하다면 여러가지 사이즈로 저장 후 배열로 리턴하는 것도 고려중",
+                                                                   "operationId":  "FilesController_uploadFile",
+                                                                   "parameters":  [
+
+                                                                                  ],
+                                                                   "requestBody":  {
+                                                                                       "required":  true,
+                                                                                       "content":  {
+                                                                                                       "multipart/form-data":  {
+                                                                                                                                   "schema":  {
+                                                                                                                                                  "type":  "object",
+                                                                                                                                                  "properties":  {
+                                                                                                                                                                     "file":  {
+                                                                                                                                                                                  "type":  "string",
+                                                                                                                                                                                  "format":  "binary",
+                                                                                                                                                                                  "description":  "프로필 이미지 (jpeg/png/webp/gif/avif, 최대 5MB)"
+                                                                                                                                                                              }
+                                                                                                                                                                 },
+                                                                                                                                                  "required":  [
+                                                                                                                                                                   "file"
+                                                                                                                                                               ]
+                                                                                                                                              }
+                                                                                                                               }
+                                                                                                   }
+                                                                                   },
+                                                                   "responses":  {
+                                                                                     "200":  {
+                                                                                                 "description":  "",
+                                                                                                 "content":  {
+                                                                                                                 "application/json":  {
+                                                                                                                                          "schema":  {
+                                                                                                                                                         "allOf":  [
+                                                                                                                                                                       {
+                                                                                                                                                                           "$ref":  "#/components/schemas/ResponseSuccess"
+                                                                                                                                                                       },
+                                                                                                                                                                       {
+                                                                                                                                                                           "properties":  {
+                                                                                                                                                                                              "data":  {
+                                                                                                                                                                                                           "$ref":  "#/components/schemas/ProfileImageUploadResponseType"
+                                                                                                                                                                                                       }
+                                                                                                                                                                                          },
+                                                                                                                                                                           "required":  [
+                                                                                                                                                                                            "data"
+                                                                                                                                                                                        ]
+                                                                                                                                                                       }
+                                                                                                                                                                   ]
+                                                                                                                                                     }
+                                                                                                                                      }
+                                                                                                             }
+                                                                                             }
+                                                                                 },
+                                                                   "security":  [
+                                                                                    {
+                                                                                        "bearer":  [
+
+                                                                                                   ]
+                                                                                    }
+                                                                                ],
+                                                                   "summary":  "Upload a profile image",
+                                                                   "tags":  [
+                                                                                "Files"
+                                                                            ]
+                                                               }
+                                                  }
               },
     "info":  {
                  "title":  "Draft Backend TS",
@@ -1245,7 +1312,11 @@
                                                                                                  },
                                                                                    "updatedAt":  {
                                                                                                      "$ref":  "#/components/schemas/DateFormatObject"
-                                                                                                 }
+                                                                                                 },
+                                                                                   "profileImageUrl":  {
+                                                                                                           "type":  "string",
+                                                                                                           "nullable":  true
+                                                                                                       }
                                                                                },
                                                                 "required":  [
                                                                                  "id",
@@ -1253,7 +1324,8 @@
                                                                                  "name",
                                                                                  "email",
                                                                                  "createdAt",
-                                                                                 "updatedAt"
+                                                                                 "updatedAt",
+                                                                                 "profileImageUrl"
                                                                              ]
                                                             },
                                        "UpdateUserDto":  {
@@ -1261,11 +1333,13 @@
                                                              "properties":  {
                                                                                 "nickname":  {
                                                                                                  "type":  "string"
-                                                                                             }
-                                                                            },
-                                                             "required":  [
-                                                                              "nickname"
-                                                                          ]
+                                                                                             },
+                                                                                "profileImageUrl":  {
+                                                                                                        "type":  "string",
+                                                                                                        "nullable":  true,
+                                                                                                        "description":  "null 으로 주입하면 기존의 프로필 삭제하고 기본 프로필 이미지로 변경함"
+                                                                                                    }
+                                                                            }
                                                          },
                                        "IdsResponseType":  {
                                                                "type":  "object",
@@ -1314,10 +1388,15 @@
                                                                       "properties":  {
                                                                                          "nickname":  {
                                                                                                           "type":  "string"
-                                                                                                      }
+                                                                                                      },
+                                                                                         "profileImageUrl":  {
+                                                                                                                 "type":  "string",
+                                                                                                                 "nullable":  true
+                                                                                                             }
                                                                                      },
                                                                       "required":  [
-                                                                                       "nickname"
+                                                                                       "nickname",
+                                                                                       "profileImageUrl"
                                                                                    ]
                                                                   },
                                        "GroupResponseType":  {
@@ -1553,7 +1632,18 @@
                                                                                         "scrapCount",
                                                                                         "isScrapped"
                                                                                     ]
-                                                                   }
+                                                                   },
+                                       "ProfileImageUploadResponseType":  {
+                                                                              "type":  "object",
+                                                                              "properties":  {
+                                                                                                 "profileImageUrl":  {
+                                                                                                                         "type":  "string"
+                                                                                                                     }
+                                                                                             },
+                                                                              "required":  [
+                                                                                               "profileImageUrl"
+                                                                                           ]
+                                                                          }
                                    }
                    }
 }
