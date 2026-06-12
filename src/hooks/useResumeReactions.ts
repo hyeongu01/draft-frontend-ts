@@ -18,6 +18,7 @@ import {
   useUsersControllerGetScrapIds,
   getUsersControllerGetLikeIdsQueryKey,
   getUsersControllerGetScrapIdsQueryKey,
+  getUsersControllerGetLikeResumesQueryKey,
 } from "@/lib/api/generated/users/users";
 import {
   useResumeReactionsControllerToggleLike,
@@ -93,6 +94,11 @@ export function useResumeReactions(
         // 토글 응답이 최종 상태 — 카운트·id 목록 캐시를 서버 기준으로 확정
         setLikeCount(data.likeCount);
         setIds(likeIdsKey, data.isLiked ? withId : withoutId);
+        // /me 좋아요 탭 목록(GET /users/me/likes/resumes)도 재동기화
+        // (키 prefix 매칭 — 탭에서 해제하면 목록에서 빠진다)
+        queryClient.invalidateQueries({
+          queryKey: getUsersControllerGetLikeResumesQueryKey(),
+        });
       },
     },
   });

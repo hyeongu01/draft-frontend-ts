@@ -1,6 +1,7 @@
 // 백엔드 미구현 구간용 목업 데이터.
-// 현재 남은 용도: /me 보관함·좋아요 탭의 "이력서 목록" (id 목록 계약만 있고 목록 계약 부재).
+// 현재 남은 용도: /me 보관함 탭의 "이력서 목록" (id 목록 계약만 있고 목록 계약 부재).
 // 좋아요·스크랩 토글/상태는 실 API(생성 훅)로 전환 완료 → src/hooks/useResumeReactions.ts
+// 좋아요 목록은 GET /users/me/likes/resumes 로 실연동 완료 → mockMyLikes 제거됨.
 import type { Resume, User } from "@/lib/types";
 
 // swagger 미반영 영역 목업 스위치 — 기본 ON. 새 임시 계약 추가 시 재사용.
@@ -203,6 +204,3 @@ const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v));
 // ── 조회 헬퍼 ──────────────────────────────────────────────
 export const mockMyBookmarks = (): Resume[] =>
   clone(RESUMES.filter((r) => r.id === "mock-1" || r.id === "mock-2"));
-
-export const mockMyLikes = (): Resume[] =>
-  clone(RESUMES.filter((r) => r.id === "mock-2"));

@@ -30,7 +30,9 @@ import type {
   IdsResponseType,
   UpdateUserDto,
   UserResponseType,
-  UsersControllerDeleteMyProfile200
+  UsersControllerDeleteMyProfile200,
+  UsersControllerGetLikeResumes200,
+  UsersControllerGetLikeResumesParams
 } from '../model';
 
 import { customFetch } from '../../orval-fetcher';
@@ -419,6 +421,100 @@ export function useUsersControllerGetScrapIds<TData = Awaited<ReturnType<typeof 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getUsersControllerGetScrapIdsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+/**
+ * 현재 로그인한 유저가 좋아요한 이력서 목록을 페이지네이션으로 반환합니다. 공개(isPublic=true) 상태인 이력서만 포함되며, 좋아요 이후 비공개로 전환되거나 삭제된 이력서는 목록에서 제외됩니다. page/limit/sort/order 쿼리 파라미터로 페이지와 정렬을 제어하고, 좋아요한 이력서가 없으면 빈 배열을 반환합니다.
+ * @summary user's liked resumes
+ */
+export const usersControllerGetLikeResumes = (
+    params?: UsersControllerGetLikeResumesParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customFetch<UsersControllerGetLikeResumes200>(
+      {url: `/users/me/likes/resumes`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getUsersControllerGetLikeResumesQueryKey = (params?: UsersControllerGetLikeResumesParams,) => {
+    return [
+    `/users/me/likes/resumes`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getUsersControllerGetLikeResumesQueryOptions = <TData = Awaited<ReturnType<typeof usersControllerGetLikeResumes>>, TError = ErrorType<void>>(params?: UsersControllerGetLikeResumesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetLikeResumes>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getUsersControllerGetLikeResumesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersControllerGetLikeResumes>>> = ({ signal }) => usersControllerGetLikeResumes(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetLikeResumes>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type UsersControllerGetLikeResumesQueryResult = NonNullable<Awaited<ReturnType<typeof usersControllerGetLikeResumes>>>
+export type UsersControllerGetLikeResumesQueryError = ErrorType<void>
+
+
+export function useUsersControllerGetLikeResumes<TData = Awaited<ReturnType<typeof usersControllerGetLikeResumes>>, TError = ErrorType<void>>(
+ params: undefined |  UsersControllerGetLikeResumesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetLikeResumes>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof usersControllerGetLikeResumes>>,
+          TError,
+          Awaited<ReturnType<typeof usersControllerGetLikeResumes>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useUsersControllerGetLikeResumes<TData = Awaited<ReturnType<typeof usersControllerGetLikeResumes>>, TError = ErrorType<void>>(
+ params?: UsersControllerGetLikeResumesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetLikeResumes>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof usersControllerGetLikeResumes>>,
+          TError,
+          Awaited<ReturnType<typeof usersControllerGetLikeResumes>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useUsersControllerGetLikeResumes<TData = Awaited<ReturnType<typeof usersControllerGetLikeResumes>>, TError = ErrorType<void>>(
+ params?: UsersControllerGetLikeResumesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetLikeResumes>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary user's liked resumes
+ */
+
+export function useUsersControllerGetLikeResumes<TData = Awaited<ReturnType<typeof usersControllerGetLikeResumes>>, TError = ErrorType<void>>(
+ params?: UsersControllerGetLikeResumesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerGetLikeResumes>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getUsersControllerGetLikeResumesQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

@@ -6,14 +6,14 @@
 //   - 내 좋아요·스크랩 id 목록: useUsersControllerGetLikeIds / GetScrapIds (GET /users/me/likes|scraps)
 //   - 화면 공용 래퍼: src/hooks/useResumeReactions.ts (낙관적 토글 + id 목록 캐시 동기화)
 import type { Resume } from "@/lib/types";
-import { mockMyBookmarks, mockMyLikes } from "./mock";
+import { mockMyBookmarks } from "./mock";
 
 // ── 아래는 swagger 미반영 계약 — mock 전용 ──────────────────
-// /me 보관함·좋아요 탭에 필요한 "이력서 목록" 엔드포인트가 아직 없다.
-// (GET /users/me/likes|scraps 는 id 배열만 반환 — 목록 화면 대조 용도)
-// TODO(백엔드 계약 요청): GET /users/me/likes/resumes, /users/me/scraps/resumes
-//   — 공개 목록과 동일한 ResumeResponseType[] + 페이지네이션. 확정 시 생성 훅으로 교체.
+// /me 보관함 탭에 필요한 "이력서 목록" 엔드포인트가 아직 없다.
+// (GET /users/me/scraps 는 id 배열만 반환 — 목록 화면 대조 용도)
+// 좋아요 목록은 GET /users/me/likes/resumes 로 실연동 완료 (/me LikedTab).
+// TODO(백엔드 계약 요청): GET /users/me/scraps/resumes
+//   — 좋아요 목록과 동일한 { items: ResumeResponseType[], metadata } 페이지네이션.
+//     확정 시 LikedTab과 동일하게 생성물로 교체.
 export const getMyBookmarks = (): Promise<Resume[]> =>
   Promise.resolve(mockMyBookmarks());
-export const getMyLikes = (): Promise<Resume[]> =>
-  Promise.resolve(mockMyLikes());

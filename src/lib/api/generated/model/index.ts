@@ -44,3 +44,6 @@ export * from './updateResumeDtoContent';
 export * from './updateUserDto';
 export * from './userResponseType';
 export * from './usersControllerDeleteMyProfile200';
+export * from './usersControllerGetLikeResumes200';
+export * from './usersControllerGetLikeResumesOrder';
+export * from './usersControllerGetLikeResumesParams';

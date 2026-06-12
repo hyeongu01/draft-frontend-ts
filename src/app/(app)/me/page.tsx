@@ -6,9 +6,14 @@ import Link from "next/link";
 import ResumeCard from "@/components/resume/ResumeCard";
 import UserAvatar from "@/components/UserAvatar";
 import EditProfileDialog from "@/components/profile/EditProfileDialog";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useUserContext } from "@/context/AuthContext";
-import { getMyBookmarks, getMyLikes } from "@/lib/api/resumes";
+import { getMyBookmarks } from "@/lib/api/resumes";
 import { useResumesControllerFindAll } from "@/lib/api/generated/resumes-private/resumes-private";
+import {
+  usersControllerGetLikeResumes,
+  getUsersControllerGetLikeResumesQueryKey,
+} from "@/lib/api/generated/users/users";
 import { useCategories } from "@/hooks/useCategories";
 import type { Resume } from "@/lib/types";
 
@@ -126,7 +131,7 @@ function TabContent({
   fallbackNickname: string;
   fallbackProfileImageUrl: string | null;
 }) {
-  // "내 이력서"는 실 엔드포인트(GET /me/resumes), saved/liked는 아직 mock.
+  // "내 이력서"(GET /me/resumes)·"좋아요"(GET /users/me/likes/resumes)는 실 엔드포인트, saved는 아직 mock.
   if (tab === "resumes")
     return (
       <OwnResumesTab
@@ -134,7 +139,8 @@ function TabContent({
         fallbackProfileImageUrl={fallbackProfileImageUrl}
       />
     );
-  return <MockListTab tab={tab} />;
+  if (tab === "liked") return <LikedTab />;
+  return <SavedTab />;
 }
 
 // 내 이력서 — GET /me/resumes (소유자 전용). 직무는 categoryId→이름 룩업.
@@ -183,29 +189,99 @@ function OwnResumesTab({
   );
 }
 
-// 보관함/좋아요 — 계약 미정, mock 유지.
-function MockListTab({ tab }: { tab: "saved" | "liked" }) {
+// 좋아요 — GET /users/me/likes/resumes (페이지네이션, 공개 피드와 동일 응답 구조).
+// "더 보기" append + 토글 후 invalidate 시 로드된 전 페이지 재동기화(목록에서 제거)가
+// 둘 다 필요해 useInfiniteQuery 사용. queryFn·queryKey는 orval 생성물 재사용 →
+// 인증·봉투 처리는 생성 훅과 동일.
+const LIKED_PAGE_LIMIT = 20;
+
+function LikedTab() {
+  const {
+    data,
+    isLoading,
+    isError,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: getUsersControllerGetLikeResumesQueryKey({
+      limit: LIKED_PAGE_LIMIT,
+    }),
+    queryFn: ({ pageParam, signal }) =>
+      usersControllerGetLikeResumes(
+        { page: pageParam, limit: LIKED_PAGE_LIMIT },
+        signal,
+      ),
+    initialPageParam: 1,
+    getNextPageParam: (last) =>
+      last.metadata.page * last.metadata.limit < last.metadata.total
+        ? last.metadata.page + 1
+        : undefined,
+  });
+
+  if (isLoading) return <ListSkeleton />;
+
+  const items = data?.pages.flatMap((p) => p.items) ?? [];
+  if (isError || !items.length)
+    return (
+      <Empty title="좋아요한 이력서가 없어요" sub="피드에서 ♥로 표현해보세요" />
+    );
+
+  return (
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {items.map((r) => (
+          <ResumeCard
+            key={r.id}
+            resumeId={r.id} // 좋아요·스크랩 토글 활성화 — 해제 시 invalidate로 목록에서 빠짐
+            href={`/resumes/${r.id}`}
+            title={r.title}
+            description={r.description}
+            jobRole={r.category?.name ?? null}
+            experienceYears={r.careerYears ?? 0}
+            nickname={r.user?.nickname ?? "익명"}
+            profileImageUrl={r.user?.profileImageUrl}
+            likeCount={r.likeCount}
+            scrapCount={r.scrapCount}
+          />
+        ))}
+      </div>
+      {hasNextPage && (
+        <div className="mt-4 text-center">
+          <button
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+            className="px-4 py-2 border rounded-md text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+          >
+            {isFetchingNextPage ? "불러오는 중…" : "더 보기"}
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+
+// 보관함 — 계약 미정, mock 유지.
+// TODO: GET /users/me/scraps/resumes 추가되면 LikedTab과 동일하게 실연동
+function SavedTab() {
   const [resumes, setResumes] = useState<Resume[] | null>(null);
 
   useEffect(() => {
     let alive = true;
     setResumes(null);
-    const loader = tab === "saved" ? getMyBookmarks : getMyLikes;
-    loader()
+    getMyBookmarks()
       .then((data) => alive && setResumes(data))
       .catch(() => alive && setResumes([]));
     return () => {
       alive = false;
     };
-  }, [tab]);
+  }, []);
 
   if (resumes === null) return <ListSkeleton />;
 
   if (!resumes.length)
-    return tab === "saved" ? (
+    return (
       <Empty title="보관한 이력서가 없어요" sub="피드에서 🔖로 보관해보세요" />
-    ) : (
-      <Empty title="좋아요한 이력서가 없어요" sub="피드에서 ♥로 표현해보세요" />
     );
 
   return (
